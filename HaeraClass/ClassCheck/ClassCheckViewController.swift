@@ -23,19 +23,52 @@ final class ClassCheckViewController: BaseViewController {
         return collectionView
     }()
 
+    private let totalLabel: UILabel = {
+        let label = UILabel()
+        label.text = "테스트"
+        label.textColor = .black
+        label.font = .boldSystemFont(ofSize: 14)
+        return label
+    }()
+
+    private let sortButton: SortButton = {
+        let button = SortButton()
+        return button
+    }()
+
+    private lazy var stackView: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [totalLabel, sortButton])
+        stack.axis = .horizontal
+        stack.distribution = .equalCentering
+        return stack
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
     }
 
     override func configureHierarchy() {
-        [collectionView].forEach { view.addSubview($0) }
+        [collectionView, stackView].forEach { view.addSubview($0) }
     }
 
     override func configureLayout() {
+        stackSubViewLayout()
+
         collectionView.snp.makeConstraints { make in
             make.top.directionalHorizontalEdges.equalTo(view.safeAreaLayoutGuide)
             make.height.equalTo(56)
+        }
+
+        stackView.snp.makeConstraints { make in
+            make.top.equalTo(collectionView.snp.bottom)
+            make.directionalHorizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
+        }
+    }
+
+    private func stackSubViewLayout() {
+        sortButton.snp.makeConstraints { make in
+            make.height.equalTo(40)
         }
     }
 
@@ -43,6 +76,11 @@ final class ClassCheckViewController: BaseViewController {
         super.configureView()
     }
 
+
+}
+
+// MARK: Rx Binding
+extension ClassCheckViewController {
     private func bind() {
         items
             .bind(to: collectionView.rx.items(cellIdentifier: ClassCategoryCell.identifier,cellType: ClassCategoryCell.self)) {
@@ -53,6 +91,12 @@ final class ClassCheckViewController: BaseViewController {
                         cell.changeButtonState()
                     }
                     .disposed(by: cell.disposeBag)
+            }
+            .disposed(by: disposeBag)
+
+        sortButton.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.sortButton.isSelected.toggle()
             }
             .disposed(by: disposeBag)
     }
