@@ -7,8 +7,12 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
 
 final class LoginViewController: BaseViewController {
+
+    var disposeBag = DisposeBag()
 
     private let loginImageView: UIImageView = {
         let imageView = UIImageView()
@@ -75,6 +79,7 @@ final class LoginViewController: BaseViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        bind()
     }
 
     override func configureHierarchy() {
@@ -127,6 +132,17 @@ final class LoginViewController: BaseViewController {
             make.top.equalTo(button.snp.bottom).offset(20)
             make.directionalHorizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
         }
+    }
+}
+
+// Rx 바인딩
+extension LoginViewController {
+    private func bind() {
+        button.rx.tap
+            .bind(with: self) { owner, _ in
+                print("buttonTapped")
+            }
+            .disposed(by: disposeBag)
     }
 }
 
