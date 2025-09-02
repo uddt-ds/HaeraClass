@@ -10,11 +10,34 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+struct Dummy {
+    let image: UIImage
+    let header: String
+    let category: String
+    let description: String
+    let salePrice: String
+    let price: String
+    let persent: String
+}
+
 final class ClassCheckViewController: BaseViewController {
 
     let disposeBag = DisposeBag()
 
+    let dummy = [
+        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
+        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
+        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
+        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
+        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
+        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
+        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
+        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%")
+    ]
+
     let items = Observable.just(ButtonTitle.allCases)
+
+    lazy var dummies = Observable.just(dummy)
 
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.makeCollectionViewFlowLayout())
@@ -108,6 +131,12 @@ extension ClassCheckViewController {
         sortButton.rx.tap
             .bind(with: self) { owner, _ in
                 owner.sortButton.isSelected.toggle()
+            }
+            .disposed(by: disposeBag)
+
+        dummies
+            .bind(to: tableView.rx.items(cellIdentifier: ClassCategoryTableViewCell.identifier, cellType:ClassCategoryTableViewCell.self)) { (row, element, cell) in
+                cell.configureCell(with: element)
             }
             .disposed(by: disposeBag)
     }

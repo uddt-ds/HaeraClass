@@ -37,17 +37,24 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
         let button = UIButton()
         button.setTitle("테스트", for: .normal)
         button.setTitleColor(ColorSet.lightOrange.color, for: .normal)
+        button.titleLabel?.font = .boldSystemFont(ofSize: 10)
         button.layer.borderColor = ColorSet.lightOrange.color.cgColor
         button.layer.borderWidth = 1
+        button.layer.cornerRadius = 4
         button.isUserInteractionEnabled = false
         return button
     }()
 
+    private let blankView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+
     private lazy var headStackView: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [headTitleLabel, categoryTag])
+        let stack = UIStackView(arrangedSubviews: [headTitleLabel, categoryTag, blankView])
         stack.axis = .horizontal
         stack.spacing = 8
-        stack.alignment = .center
         stack.distribution = .fill
         return stack
     }()
@@ -56,7 +63,7 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
         let label = UILabel()
         label.text = "콘텐츠 테스트"
         label.textColor = ColorSet.lightGray.color
-        label.font = .boldSystemFont(ofSize: 10)
+        label.font = .boldSystemFont(ofSize: 12)
         return label
     }()
 
@@ -85,8 +92,14 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
         return label
     }()
 
+    private let priceBlankView: UIView = {
+        let view = UIView()
+        view.backgroundColor = .clear
+        return view
+    }()
+
     private lazy var priceStackView: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [rawPrice, price, percentLabel])
+        let stack = UIStackView(arrangedSubviews: [rawPrice, price, percentLabel, priceBlankView])
         stack.axis = .horizontal
         stack.spacing = 12
         stack.alignment = .center
@@ -117,6 +130,7 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
 
         headStackView.snp.makeConstraints { make in
             make.top.equalTo(classImageView.snp.bottom).offset(12)
+            make.height.equalTo(20)
             make.directionalHorizontalEdges.equalTo(classImageView)
         }
 
@@ -132,7 +146,26 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
         }
     }
 
+    private func configureStackSubViewLayout() {
+        categoryTag.snp.makeConstraints { make in
+            make.height.equalTo(16)
+        }
+
+        blankView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+
+        priceBlankView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+    }
+
     override func configureView() {
         super.configureView()
+    }
+
+    func configureCell(with data: Dummy) {
+        classImageView.image = data.image
+        headTitleLabel.text = data.header
+        categoryTag.setTitle(data.category, for: .normal)
+        rawPrice.text = data.price
+        price.text = data.salePrice
+        percentLabel.text = data.persent
     }
 }
