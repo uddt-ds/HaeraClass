@@ -43,13 +43,19 @@ final class ClassCheckViewController: BaseViewController {
         return stack
     }()
 
+    private let tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.register(ClassCategoryTableViewCell.self, forCellReuseIdentifier: ClassCategoryTableViewCell.identifier)
+        return tableView
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
     }
 
     override func configureHierarchy() {
-        [collectionView, stackView].forEach { view.addSubview($0) }
+        [collectionView, stackView, tableView].forEach { view.addSubview($0) }
     }
 
     override func configureLayout() {
@@ -63,6 +69,11 @@ final class ClassCheckViewController: BaseViewController {
         stackView.snp.makeConstraints { make in
             make.top.equalTo(collectionView.snp.bottom)
             make.directionalHorizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
+        }
+
+        tableView.snp.makeConstraints { make in
+            make.top.equalTo(stackView.snp.bottom)
+            make.directionalHorizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
         }
     }
 
