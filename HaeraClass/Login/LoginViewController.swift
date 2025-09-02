@@ -30,14 +30,10 @@ final class LoginViewController: BaseViewController {
 
     private let idTextField: UITextField = {
         let txtField = UITextField()
-        txtField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
-        txtField.leftViewMode = .always
-        txtField.placeholder = TextField.id.phText
-        txtField.font = .systemFont(ofSize: 12)
-        txtField.textColor = .black
-        txtField.layer.borderColor = ColorSet.orange.color.cgColor
-        txtField.layer.cornerRadius = 10
-        txtField.layer.borderWidth = 1
+        txtField.setField(placeHolder: TextField.id.phText,
+                          borderColor: ColorSet.orange.color.cgColor,
+                          borderWidth: 2,
+                          radius: 10)
         txtField.becomeFirstResponder()
         return txtField
     }()
@@ -52,14 +48,10 @@ final class LoginViewController: BaseViewController {
 
     private let pwTextField: UITextField = {
         let txtField = UITextField()
-        txtField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
-        txtField.leftViewMode = .always
-        txtField.placeholder = TextField.pw.phText
-        txtField.font = .systemFont(ofSize: 12)
-        txtField.textColor = .black
-        txtField.layer.borderColor = ColorSet.orange.color.cgColor
-        txtField.layer.cornerRadius = 10
-        txtField.layer.borderWidth = 1
+        txtField.setField(placeHolder: TextField.id.phText,
+                          borderColor: ColorSet.orange.color.cgColor,
+                          borderWidth: 2,
+                          radius: 10)
         return txtField
     }()
 
@@ -135,7 +127,7 @@ final class LoginViewController: BaseViewController {
     }
 }
 
-// Rx 바인딩
+// MARK: Rx Binding
 extension LoginViewController {
     private func bind() {
         button.rx.tap
@@ -158,6 +150,4 @@ extension LoginViewController {
             }
         }
     }
-
-
 }
