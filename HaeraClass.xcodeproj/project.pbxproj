@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		9B47029A2E66CB8F00284F21 /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 9B4702992E66CB8F00284F21 /* .gitignore */; };
+		9B47038F2E66E43200284F21 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 9B47038E2E66E43200284F21 /* SnapKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9B47038F2E66E43200284F21 /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -84,6 +86,7 @@
 			);
 			name = HaeraClass;
 			packageProductDependencies = (
+				9B47038E2E66E43200284F21 /* SnapKit */,
 			);
 			productName = HaeraClass;
 			productReference = 9B47026C2E66C9B500284F21 /* HaeraClass.app */;
@@ -113,6 +116,9 @@
 			);
 			mainGroup = 9B4702632E66C9B500284F21;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				9B47038D2E66E43200284F21 /* XCRemoteSwiftPackageReference "SnapKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9B47026D2E66C9B500284F21 /* Products */;
 			projectDirPath = "";
@@ -147,6 +153,8 @@
 /* Begin XCBuildConfiguration section */
 		9B4702802E66C9B600284F21 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 9B47026E2E66C9B500284F21 /* HaeraClass */;
+			baseConfigurationReferenceRelativePath = Secret/Config.xcconfig;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -211,6 +219,8 @@
 		};
 		9B4702822E66C9B600284F21 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReferenceAnchor = 9B47026E2E66C9B500284F21 /* HaeraClass */;
+			baseConfigurationReferenceRelativePath = Secret/Config.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -350,6 +360,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9B47038D2E66E43200284F21 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9B47038E2E66E43200284F21 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9B47038D2E66E43200284F21 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9B4702642E66C9B500284F21 /* Project object */;
 }
