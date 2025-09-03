@@ -16,13 +16,13 @@ final class NetworkManager {
 
     private init() { }
 
-    func fetchData<T: Decodable>(router: Router, value: T.Type) -> Single<Result<T, Error>> {
+    func fetchData<T: Decodable>(router: Router, type: T.Type) -> Single<Result<T, AFError>> {
         return Single.create { value in
             if let url = router.endPoint {
                 AF.request(url,
                            method: router.method,
                            parameters: router.parameter,
-                           encoding: JSONParameterEncoder.default as! ParameterEncoding,
+                           encoding: JSONEncoding.default,
                            headers: router.header)
                 .responseDecodable(of: T.self) { responseData in
                     switch responseData.result {
