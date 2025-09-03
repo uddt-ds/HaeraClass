@@ -164,8 +164,8 @@ extension LoginViewController {
                           let sceneDelegate = windowScene.delegate as? SceneDelegate else { return }
 
                     //TODO: 탭바 컨트롤러로 변경하기
-                    let vc = ClassCheckViewController()
-                    sceneDelegate.window?.rootViewController = vc
+                    let tabBar = TabBarController()
+                    sceneDelegate.window?.rootViewController = tabBar
                     sceneDelegate.window?.makeKeyAndVisible()
 
                     guard let window = sceneDelegate.window else { return }
