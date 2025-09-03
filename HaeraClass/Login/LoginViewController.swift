@@ -14,6 +14,8 @@ final class LoginViewController: BaseViewController {
 
     var disposeBag = DisposeBag()
 
+    let viewModel = LoginViewModel()
+
     private let loginImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.image = .splash
@@ -125,15 +127,58 @@ final class LoginViewController: BaseViewController {
             make.directionalHorizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
         }
     }
+
+    private func buttonState(_ state: Bool) {
+        button.isEnabled = state
+        if button.isEnabled {
+            button.backgroundColor = ColorSet.lightOrange.color
+        } else {
+            button.backgroundColor = ColorSet.darkGray.color
+        }
+    }
 }
 
 // MARK: Rx Binding
 extension LoginViewController {
     private func bind() {
-        button.rx.tap
-            .bind(with: self) { owner, _ in
-                print("buttonTapped")
+        let input = LoginViewModel.Input(idTextField: idTextField.rx.text.orEmpty,
+                                         pwTextField: pwTextField.rx.text.orEmpty,
+                                         loginButtonTapped: button.rx.tap)
+
+        let output = viewModel.transform(input: input)
+
+        output.validateResult
+            .bind(to: validateLabel.rx.text)
+            .disposed(by: disposeBag)
+
+        output.loginValue
+            .bind(with: self) { owner, value in
+                dump(value)
             }
+            .disposed(by: disposeBag)
+
+        output.loginResult
+            .bind(with: self) { owner, value in
+                if value {
+                    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                          let sceneDelegate = windowScene.delegate as? SceneDelegate else { return }
+
+                    //TODO: 탭바 컨트롤러로 변경하기
+                    let vc = ClassCheckViewController()
+                    sceneDelegate.window?.rootViewController = vc
+                    sceneDelegate.window?.makeKeyAndVisible()
+
+                    guard let window = sceneDelegate.window else { return }
+
+                    UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve) { }
+                }
+            }
+            .disposed(by: disposeBag)
+
+        output.loginButtonState
+            .bind(with: self, onNext: { owner, value in
+                owner.buttonState(value)
+            })
             .disposed(by: disposeBag)
     }
 }
