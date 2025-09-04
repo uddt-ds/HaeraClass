@@ -23,36 +23,46 @@ final class ClassDetailViewController: BaseViewController {
 
     let viewModel: ClassDetailViewModel
 
-    let dummy = [
-        Dummy2(place: "미정", time: "미정", people: "미정", intro: "테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트"),
-        Dummy2(place: "미정", time: "미정", people: "미정", intro: "테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트"),
-        Dummy2(place: "미정", time: "미정", people: "미정", intro: "테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트 테스트")
-        ]
-
-
-    lazy var dummies = Observable.just(dummy)
-
-    let tableView: UITableView = {
-        let tableView = UITableView()
-        tableView.register(ClassDetailPhotoCell.self, forCellReuseIdentifier: ClassDetailPhotoCell.identifier)
-        tableView.register(ClassInfoCell.self, forCellReuseIdentifier: ClassInfoCell.identifier)
-        tableView.register(ClassIntroCell.self, forCellReuseIdentifier: ClassIntroCell.identifier)
-        tableView.rowHeight = UITableView.automaticDimension
-        return tableView
+    private lazy var collectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.makeCollectionViewLayout())
+        collectionView.register(DetailPhotoCell.self, forCellWithReuseIdentifier: DetailPhotoCell.identifier)
+        return collectionView
     }()
 
-    let underBarBgView: UIView = {
+    private let profileImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 15
+        imageView.backgroundColor = .blue
+        imageView.clipsToBounds = true
+        return imageView
+    }()
+
+    private let nickLabel: UILabel = {
+        let label = UILabel()
+        label.text = "테스트"
+        label.textColor = .black
+        label.font = .boldSystemFont(ofSize: 12)
+        return label
+    }()
+
+    private let classInfoView: ClassInfoView = {
+        let view = ClassInfoView()
+        return view
+    }()
+
+    private let underBarBgView: UIView = {
         let view = UIView()
         view.backgroundColor = .white
         return view
     }()
 
-    let commentButton: CustomButton = {
+    private let commentButton: CustomButton = {
         let button = CustomButton("댓글보기 (0)")
         return button
     }()
 
-    let heartButton: UIButton = {
+    private let heartButton: UIButton = {
         let button = UIButton()
         button.setImage(.likeButton.withRenderingMode(.alwaysTemplate), for: .normal)
         button.tintColor = ColorSet.darkGray.color
@@ -67,6 +77,26 @@ final class ClassDetailViewController: BaseViewController {
         return stack
     }()
 
+    let headLabel: UILabel = {
+        let label = UILabel()
+        label.text = "클래스 소개"
+        label.textColor = .darkGray
+        label.font = .boldSystemFont(ofSize: 14)
+        return label
+    }()
+
+    let introTextView: UITextView = {
+        let textView = UITextView()
+        textView.textColor = .darkGray
+        textView.font = .systemFont(ofSize: 12)
+        textView.text = "테스트"
+        textView.isSelectable = false
+        textView.isEditable = false
+        textView.isScrollEnabled = true
+        textView.showsVerticalScrollIndicator = false
+        return textView
+    }()
+
     init(viewModel: ClassDetailViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -75,7 +105,6 @@ final class ClassDetailViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
-        tableView.rowHeight = 250
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -94,16 +123,43 @@ final class ClassDetailViewController: BaseViewController {
         super.configureHierarchy()
         underBarBgView.addSubview(stackView)
 
-        [tableView, underBarBgView].forEach { view.addSubview($0) }
+        [collectionView, profileImageView, nickLabel, classInfoView, headLabel, introTextView, underBarBgView].forEach { view.addSubview($0) }
     }
 
     override func configureLayout() {
         super.configureLayout()
         configureStackSubViewLayout()
 
-        tableView.snp.makeConstraints { make in
-            make.top.equalTo(view.safeAreaLayoutGuide)
-            make.directionalHorizontalEdges.equalTo(view.safeAreaLayoutGuide)
+        collectionView.snp.makeConstraints { make in
+            make.top.directionalHorizontalEdges.equalTo(view.safeAreaLayoutGuide)
+            make.height.equalTo(200)
+        }
+
+        profileImageView.snp.makeConstraints { make in
+            make.top.equalTo(collectionView.snp.bottom).offset(20)
+            make.size.equalTo(30)
+            make.leading.equalToSuperview().offset(20)
+        }
+
+        nickLabel.snp.makeConstraints { make in
+            make.centerY.equalTo(profileImageView)
+            make.leading.equalTo(profileImageView.snp.trailing).offset(12)
+        }
+
+        classInfoView.snp.makeConstraints { make in
+            make.top.equalTo(profileImageView.snp.bottom).offset(20)
+            make.directionalHorizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
+            make.height.equalTo(131)
+        }
+
+        headLabel.snp.makeConstraints { make in
+            make.top.equalTo(classInfoView.snp.bottom).offset(20)
+            make.leading.equalTo(view.safeAreaLayoutGuide).offset(20)
+        }
+
+        introTextView.snp.makeConstraints { make in
+            make.top.equalTo(headLabel.snp.bottom).offset(20)
+            make.directionalHorizontalEdges.equalTo(view.safeAreaLayoutGuide).inset(20)
             make.bottom.equalTo(underBarBgView.snp.top)
         }
 
@@ -132,33 +188,41 @@ final class ClassDetailViewController: BaseViewController {
     override func configureView() {
         super.configureView()
     }
+
+    private func configureDetailView(data: ClassDetail) {
+        nickLabel.text = data.creator.nick
+        classInfoView.configureInfoView(data: data)
+        introTextView.text = data.description
+    }
+
+    private func changeButtonState(_ isOn: Bool) {
+        if isOn {
+            commentButton.isEnabled = true
+            commentButton.backgroundColor = ColorSet.lightOrange.color
+        } else {
+            commentButton.isEnabled = false
+            commentButton.backgroundColor = ColorSet.darkGray.color
+        }
+    }
 }
+
+extension ClassDetailViewController {
+    private func makeCollectionViewLayout() -> UICollectionViewFlowLayout {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.sectionInset = .zero
+        layout.minimumInteritemSpacing = .zero
+        layout.minimumLineSpacing = .zero
+        let deviceWidth = UIScreen.main.bounds.width
+        layout.itemSize = .init(width: deviceWidth, height: deviceWidth * 1.2)
+        return layout
+    }
+}
+
 
 //MARK: Rx Binding
 extension ClassDetailViewController {
     private func bind() {
-
-        tableView.rx.setDelegate(self)
-            .disposed(by: disposeBag)
-
-        // 데이터 개수가 1개니까 row도 1개....
-        dummies
-            .bind(to: tableView.rx.items) { (tableView, row, element) in
-                switch row {
-                case 0:
-                    guard let cell = tableView.dequeueReusableCell(withIdentifier: ClassDetailPhotoCell.identifier, for: IndexPath(row: row, section: 0)) as? ClassDetailPhotoCell else { return .init () }
-                    return cell
-                case 1:
-                    guard let cell = tableView.dequeueReusableCell(withIdentifier: ClassInfoCell.identifier, for: IndexPath(row: row, section: 0)) as? ClassInfoCell  else { return .init() }
-                    return cell
-                case 2:
-                    guard let cell = tableView.dequeueReusableCell(withIdentifier: ClassIntroCell.identifier, for: IndexPath(row: row, section: 0)) as? ClassIntroCell else { return .init() }
-                    return cell
-                default:
-                    return .init()
-                }
-            }
-            .disposed(by: disposeBag)
 
         let input = ClassDetailViewModel.Input(viewDidLoadTrigger: Observable.just(()))
 
@@ -166,12 +230,15 @@ extension ClassDetailViewController {
 
         output.detailData
             .bind(with: self) { owner, value in
-                print(value)
+                owner.configureDetailView(data: value)
+            }
+            .disposed(by: disposeBag)
+
+        output.commentData
+            .bind(with: self) { owner, value in
+                owner.changeButtonState(value.data.count > 0)
+                owner.commentButton.setTitle("댓글보기 (\(value.data.count))", for: .normal)
             }
             .disposed(by: disposeBag)
     }
-}
-
-extension ClassDetailViewController: UITableViewDelegate {
-
 }

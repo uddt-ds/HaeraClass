@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ClassDetailModel: Decodable {
+struct ClassDetail: Decodable {
     let classId: String
     let category: Int
     let title: String

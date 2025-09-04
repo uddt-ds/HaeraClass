@@ -17,33 +17,31 @@ final class ClassDetailViewModel: ViewModelProtocol {
 
     private let networkManager = NetworkManager.shared
 
-    private var list = [
-        SectionOfCustomData(header: "", items: [""]),
-        SectionOfCustomData(header: "", items: [""]),
-        SectionOfCustomData(header: "", items: [""])
-    ]
-
     struct Input {
         let viewDidLoadTrigger: Observable<Void>
     }
 
     struct Output {
-        let detailData: PublishRelay<ClassDetailModel>
+        let detailData: PublishRelay<ClassDetail>
+        let commentData: PublishRelay<Comment>
     }
 
     func transform(input: Input) -> Output {
 
-        let detailData = PublishRelay<ClassDetailModel>()
+        let detailData = PublishRelay<ClassDetail>()
+        let commentData = PublishRelay<Comment>()
 
-        input.viewDidLoadTrigger
+        let viewDidLoad = input.viewDidLoadTrigger
+            .share()
+
+        viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
-                return owner.networkManager.getData(router: .classDetail(classId: owner.classId), type: ClassDetailModel.self)
+                return owner.networkManager.getData(router: .classDetail(classId: owner.classId), type: ClassDetail.self)
             }
             .bind(with: self) { owner, responseData in
                 switch responseData {
                 case .success(let data):
-                    print(data)
                     detailData.accept(data)
                 case .failure(let error):
                     print(error)
@@ -51,7 +49,23 @@ final class ClassDetailViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
-        return Output(detailData: detailData)
+        viewDidLoad
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                return owner.networkManager.getData(router: .commentSearch(classId: owner.classId), type: Comment.self)
+            }
+            .bind(with: self) { owner, responseData in
+                switch responseData {
+                case .success(let data):
+                    print(data)
+                    commentData.accept(data)
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
+
+        return Output(detailData: detailData, commentData: commentData)
     }
 
     init(classId: String) {

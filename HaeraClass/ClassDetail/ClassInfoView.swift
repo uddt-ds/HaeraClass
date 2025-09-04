@@ -1,30 +1,13 @@
 //
-//  ClassInfoCell.swift
+//  ClassInfoView.swift
 //  HaeraClass
 //
-//  Created by Lee on 9/3/25.
+//  Created by Lee on 9/4/25.
 //
 
 import UIKit
-import SnapKit
 
-final class ClassInfoCell: BaseTableViewCell, ReusableViewProtocol {
-
-    private let profileImageView: UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.layer.cornerRadius = 15
-        imageView.clipsToBounds = true
-        return imageView
-    }()
-
-    private let nickLabel: UILabel = {
-        let label = UILabel()
-        label.text = "테스트"
-        label.textColor = .black
-        label.font = .boldSystemFont(ofSize: 12)
-        return label
-    }()
+final class ClassInfoView: UIView {
 
     private let locationLabel: UILabel = {
         let label = UILabel()
@@ -73,13 +56,13 @@ final class ClassInfoCell: BaseTableViewCell, ReusableViewProtocol {
         return stack
     }()
 
-    let timeImage: UIImageView = {
+    private let timeImage: UIImageView = {
         let imageView = UIImageView()
         imageView.image = .time
         return imageView
     }()
 
-    let timeDetailLabel: UILabel = {
+    private let timeDetailLabel: UILabel = {
         let label = UILabel()
         label.text = "테스트"
         label.textColor = ColorSet.lightGray.color
@@ -96,13 +79,13 @@ final class ClassInfoCell: BaseTableViewCell, ReusableViewProtocol {
         return stack
     }()
 
-    let peopleImage: UIImageView = {
+    private let peopleImage: UIImageView = {
         let imageView = UIImageView()
         imageView.image = .people
         return imageView
     }()
 
-    let peopleDetailLabel: UILabel = {
+    private let peopleDetailLabel: UILabel = {
         let label = UILabel()
         label.text = "테스트"
         label.textColor = ColorSet.lightGray.color
@@ -119,52 +102,28 @@ final class ClassInfoCell: BaseTableViewCell, ReusableViewProtocol {
         return stack
     }()
 
-    private let bgView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        view.layer.borderWidth = 1
-        view.layer.borderColor = ColorSet.lightGray.color.cgColor
-        view.layer.cornerRadius = 12
-        view.clipsToBounds = true
-        return view
-    }()
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        configureHierarchy()
+        configureLayout()
+        configureView()
     }
 
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
 
-    override func configureHierarchy() {
-        super.configureHierarchy()
-
-        [profileImageView, nickLabel, bgView].forEach { contentView.addSubview($0) }
-
+    private func configureHierarchy() {
         [locationLabel, locationStackView, timeLabel, timeStackView, peopleLabel, peopleStackView]
-            .forEach { bgView.addSubview($0) }
-
+            .forEach { self.addSubview($0) }
     }
 
-    override func configureLayout() {
-        super.configureLayout()
+    private func configureLayout() {
         configureStackSubViewLayout()
 
-        profileImageView.snp.makeConstraints { make in
-            make.top.leading.equalTo(contentView.safeAreaLayoutGuide).inset(20)
-            make.size.equalTo(30)
-        }
-
-        nickLabel.snp.makeConstraints { make in
-            make.centerY.equalTo(profileImageView)
-            make.leading.equalTo(profileImageView.snp.trailing).offset(12)
-        }
-
-        bgView.snp.makeConstraints { make in
-            make.top.equalTo(profileImageView.snp.bottom).offset(20)
-            make.directionalHorizontalEdges.bottom.equalTo(contentView.safeAreaLayoutGuide).inset(20)
-        }
-
         locationLabel.snp.makeConstraints { make in
-            make.top.leading.equalToSuperview().inset(30)
+            make.top.leading.equalToSuperview().inset(20)
         }
 
         timeLabel.snp.makeConstraints { make in
@@ -193,10 +152,6 @@ final class ClassInfoCell: BaseTableViewCell, ReusableViewProtocol {
         }
     }
 
-    override func configureView() {
-        super.configureView()
-    }
-
     private func configureStackSubViewLayout() {
         [locationImage, timeImage, peopleImage].forEach {
             $0.snp.makeConstraints { make in
@@ -204,9 +159,28 @@ final class ClassInfoCell: BaseTableViewCell, ReusableViewProtocol {
             }
         }
     }
+
+    private func configureView() {
+        self.layer.cornerRadius = 16
+        self.layer.borderWidth = 1
+        self.layer.borderColor = ColorSet.darkGray.color.cgColor
+        self.clipsToBounds = true
+    }
+
+    func configureInfoView(data: ClassDetail) {
+        let date = DateManager.setupDate(value: data.date)
+
+        locationDetailLabel.text = data.location ?? "미정"
+        timeDetailLabel.text = date
+        if data.capacity == nil {
+            peopleDetailLabel.text = "미정"
+        } else {
+            peopleDetailLabel.text = "\(data.capacity!)"
+        }
+    }
 }
 
-extension ClassInfoCell {
+extension ClassInfoView {
     enum ClassInfoTitle: String {
         case place = "장소"
         case time = "시간"
