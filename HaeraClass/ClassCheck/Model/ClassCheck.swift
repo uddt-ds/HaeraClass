@@ -16,12 +16,12 @@ struct Data: Decodable {
     let category: Int
     let title: String
     let description: String
-    let price: Int
-    let salePrice: Int
+    let price: Int?
+    let salePrice: Int?
     let imageUrl: String
     let createdAt: String
     let isLiked: Bool
-    let creator: [Creator]
+    let creator: Creator
 
     enum CodingKeys: String, CodingKey {
         case classId = "class_id"
@@ -34,6 +34,37 @@ struct Data: Decodable {
         case createdAt = "created_at"
         case isLiked = "is_liked"
         case creator
+    }
+}
+
+extension Data {
+    var bindImageUrl: URL? {
+        return URL(string: BaseURL.url + "/v1" + imageUrl)
+    }
+
+    var categoryTitle: String {
+        return CategoryTitle(rawValue: category)?.title ?? ""
+    }
+
+    var bindSalePrice: String {
+        guard let salePrice else {
+            return "무료"
+        }
+        return "\(salePrice)"
+    }
+
+    var bindPrice: String {
+        guard let price else {
+            return "무료"
+        }
+        return "\(price)"
+    }
+
+    var persent: String {
+        if let price, let salePrice {
+            return "\((salePrice * 100) / price)%"
+        }
+        return ""
     }
 }
 
