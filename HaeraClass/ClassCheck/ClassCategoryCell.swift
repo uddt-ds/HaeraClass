@@ -69,9 +69,9 @@ final class ClassCategoryCell: UICollectionViewCell, ReusableViewProtocol {
     }
 
 }
-
-extension Reactive where Base: ClassCategoryCell {
-    var buttonTap: ControlEvent<Void> {
-        return base.button.rx.tap
-    }
-}
+//
+//extension Reactive where Base: ClassCategoryCell {
+//    var buttonTap: ControlEvent<Void> {
+//        return base.button.rx.tap
+//    }
+//}

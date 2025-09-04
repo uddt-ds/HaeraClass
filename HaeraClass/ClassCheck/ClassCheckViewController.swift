@@ -24,8 +24,6 @@ final class ClassCheckViewController: BaseViewController {
 
     let disposeBag = DisposeBag()
 
-    let items = Observable.just(CategoryTitle.allCases)
-
     let viewModel = ClassCheckViewModel()
 
     private lazy var collectionView: UICollectionView = {
@@ -106,7 +104,9 @@ final class ClassCheckViewController: BaseViewController {
 extension ClassCheckViewController {
     private func bind() {
 
-        let input = ClassCheckViewModel.Input(initialSet: Observable.just(()), categoryButtonTap: collectionView.rx.itemSelected, sortButtonTap: sortButton.rx.tap)
+        let buttonState = BehaviorRelay(value: false)
+
+        let input = ClassCheckViewModel.Input(initialSet: Observable.just(()), categoryButtonTap: collectionView.rx.itemSelected, currentButtonState: buttonState, sortButtonTap: sortButton.rx.tap)
 
         let output = viewModel.transform(input: input)
 
@@ -120,25 +120,23 @@ extension ClassCheckViewController {
             .bind(to: totalLabel.rx.text)
             .disposed(by: disposeBag)
 
-
-        items
+        output.buttonItems
             .bind(to: collectionView.rx.items(cellIdentifier: ClassCategoryCell.identifier,cellType: ClassCategoryCell.self)) {
                 (row, element, cell) in
                 cell.configureCell(with: element.title)
-                cell.rx.buttonTap
-                    .bind(with: self) { owner, _ in
-                        cell.changeButtonState()
-                    }
-                    .disposed(by: cell.disposeBag)
             }
             .disposed(by: disposeBag)
 
         sortButton.rx.tap
             .bind(with: self) { owner, _ in
                 owner.sortButton.isSelected.toggle()
+                buttonState.accept(owner.sortButton.isSelected)
             }
             .disposed(by: disposeBag)
+
+        //TODO: collectionView 버튼 선택 기능 구현 필요
     }
+
 }
 
 extension ClassCheckViewController {
