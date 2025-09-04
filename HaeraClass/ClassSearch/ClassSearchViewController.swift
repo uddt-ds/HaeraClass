@@ -96,7 +96,9 @@ extension ClassSearchViewController {
 
         tableView.rx.modelSelected(Data.self)
             .bind(with: self) { owner, data in
-                print(data.classId)
+                let viewModel = ClassDetailViewModel(classId: data.classId)
+                let vc = ClassDetailViewController(viewModel: viewModel)
+                owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
     }

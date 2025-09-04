@@ -49,6 +49,8 @@ final class TabBarController: UITabBarController {
     }
 
     private func setupNavTitle() {
+        self.tabBar.backgroundColor = .white
+        
         let firstLabel = configureNavLabel(TabBarMenu.category.navTitle)
         firstNav.navigationBar.topItem?.leftBarButtonItem = UIBarButtonItem(customView: firstLabel)
 
