@@ -7,6 +7,7 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol {
 
@@ -160,12 +161,32 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
         super.configureView()
     }
 
-    func configureCell(with data: Dummy) {
-        classImageView.image = data.image
-        headTitleLabel.text = data.header
-        categoryTag.setTitle(data.category, for: .normal)
-        rawPrice.text = data.price
-        price.text = data.salePrice
+    func configureCell(with data: Data) {
+        guard let headerKey = Bundle.main.object(forInfoDictionaryKey: "SesacKey") as? String else { return }
+
+        let modifier = AnyModifier { request in
+            var header = request
+            header.setValue(UserDefaults.standard.string(forKey: "token") ?? "", forHTTPHeaderField: "Authorization")
+            header.setValue(headerKey, forHTTPHeaderField: "SesacKey")
+            return header
+        }
+
+        classImageView.kf.setImage(with: data.bindImageUrl,
+                                   options: [
+                                    .requestModifier(modifier)
+                                   ]
+        )
+        headTitleLabel.text = data.title
+        categoryTag.setTitle(data.categoryTitle, for: .normal)
+        contentTitle.text = data.description
+        rawPrice.text = data.bindPrice
+        price.text = data.bindSalePrice
         percentLabel.text = data.persent
+
+        if data.bindSalePrice == "무료" {
+            rawPrice.isHidden = true
+        } else {
+            rawPrice.isHidden = false
+        }
     }
 }

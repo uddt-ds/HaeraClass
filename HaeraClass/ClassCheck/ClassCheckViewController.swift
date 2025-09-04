@@ -24,20 +24,9 @@ final class ClassCheckViewController: BaseViewController {
 
     let disposeBag = DisposeBag()
 
-    let dummy = [
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%")
-    ]
+    let items = Observable.just(CategoryTitle.allCases)
 
-    let items = Observable.just(ButtonTitle.allCases)
-
-    lazy var dummies = Observable.just(dummy)
+    let viewModel = ClassCheckViewModel()
 
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.makeCollectionViewFlowLayout())
@@ -116,6 +105,22 @@ final class ClassCheckViewController: BaseViewController {
 // MARK: Rx Binding
 extension ClassCheckViewController {
     private func bind() {
+
+        let input = ClassCheckViewModel.Input(initialSet: Observable.just(()), categoryButtonTap: collectionView.rx.itemSelected, sortButtonTap: sortButton.rx.tap)
+
+        let output = viewModel.transform(input: input)
+
+        output.selectedData
+            .bind(to: tableView.rx.items(cellIdentifier: ClassCategoryTableViewCell.identifier, cellType:ClassCategoryTableViewCell.self)) { (row, element, cell) in
+                cell.configureCell(with: element)
+            }
+            .disposed(by: disposeBag)
+
+        output.totalCount
+            .bind(to: totalLabel.rx.text)
+            .disposed(by: disposeBag)
+
+
         items
             .bind(to: collectionView.rx.items(cellIdentifier: ClassCategoryCell.identifier,cellType: ClassCategoryCell.self)) {
                 (row, element, cell) in
@@ -131,12 +136,6 @@ extension ClassCheckViewController {
         sortButton.rx.tap
             .bind(with: self) { owner, _ in
                 owner.sortButton.isSelected.toggle()
-            }
-            .disposed(by: disposeBag)
-
-        dummies
-            .bind(to: tableView.rx.items(cellIdentifier: ClassCategoryTableViewCell.identifier, cellType:ClassCategoryTableViewCell.self)) { (row, element, cell) in
-                cell.configureCell(with: element)
             }
             .disposed(by: disposeBag)
     }
@@ -176,28 +175,27 @@ extension ClassCheckViewController {
     }
 }
 
-extension ClassCheckViewController {
-    enum ButtonTitle: Int, CaseIterable {
-        case total
-        case develop = 101
-        case design = 102
-        case foreignLanguage = 201
-        case life = 202
-        case beauty = 203
-        case moneyTech = 301
-        case etc = 900
+// TODO: 위치 변경 필요
+enum CategoryTitle: Int, CaseIterable {
+    case total
+    case develop = 101
+    case design = 102
+    case foreignLanguage = 201
+    case life = 202
+    case beauty = 203
+    case moneyTech = 301
+    case etc = 900
 
-        var title: String {
-            switch self {
-            case .total: return "전체"
-            case .develop: return "개발"
-            case .design: return "디자인"
-            case .foreignLanguage: return "외국어"
-            case .life: return "라이프"
-            case .beauty: return "뷰티"
-            case .moneyTech: return "재테크"
-            case .etc: return "기타"
-            }
+    var title: String {
+        switch self {
+        case .total: return "전체"
+        case .develop: return "개발"
+        case .design: return "디자인"
+        case .foreignLanguage: return "외국어"
+        case .life: return "라이프"
+        case .beauty: return "뷰티"
+        case .moneyTech: return "재테크"
+        case .etc: return "기타"
         }
     }
 }

@@ -153,7 +153,7 @@ extension LoginViewController {
 
         output.loginValue
             .bind(with: self) { owner, value in
-                dump(value)
+                UserDefaults.standard.set(value.accessToken, forKey: "token")
             }
             .disposed(by: disposeBag)
 
