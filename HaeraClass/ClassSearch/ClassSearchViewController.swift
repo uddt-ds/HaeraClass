@@ -14,18 +14,7 @@ final class ClassSearchViewController: BaseViewController {
 
     var disposeBag = DisposeBag()
 
-    let dummy = [
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%"),
-        Dummy(image: .noProfile, header: "테스트", category: "테스트", description: "테스트테스트테스트", salePrice: "1000000원", price: "1000000원", persent: "90%")
-    ]
-
-    lazy var dummies = Observable.just(dummy)
+    let viewModel = ClassSearchViewModel()
 
     private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
@@ -47,6 +36,13 @@ final class ClassSearchViewController: BaseViewController {
         return tableView
     }()
 
+    private let resultLabel: UILabel = {
+        let label = UILabel()
+        label.textColor = .black
+        label.font = .boldSystemFont(ofSize: 14)
+        return label
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
@@ -54,7 +50,7 @@ final class ClassSearchViewController: BaseViewController {
 
     override func configureHierarchy() {
         super.configureHierarchy()
-        [searchBar, tableView].forEach { view.addSubview($0) }
+        [searchBar, tableView, resultLabel].forEach { view.addSubview($0) }
     }
 
     override func configureLayout() {
@@ -69,6 +65,10 @@ final class ClassSearchViewController: BaseViewController {
             make.top.equalTo(searchBar.snp.bottom).offset(20)
             make.directionalHorizontalEdges.bottom.equalTo(view.safeAreaLayoutGuide)
         }
+
+        resultLabel.snp.makeConstraints { make in
+            make.center.equalTo(tableView)
+        }
     }
 
     override func configureView() {
@@ -79,9 +79,24 @@ final class ClassSearchViewController: BaseViewController {
 // MARK: Rx Binding
 extension ClassSearchViewController {
     private func bind() {
-        dummies
+
+        let input = ClassSearchViewModel.Input(searchText: searchBar.rx.text.orEmpty, searchButtonTapped: searchBar.rx.searchButtonClicked)
+
+        let output = viewModel.transform(input: input)
+
+        output.searchResult
             .bind(to: tableView.rx.items(cellIdentifier: ClassSearchCell.identifier, cellType: ClassSearchCell.self)) { (row, element, cell) in
                 cell.configureCell(with: element)
+            }
+            .disposed(by: disposeBag)
+
+        output.searchResultLabel
+            .bind(to: resultLabel.rx.text)
+            .disposed(by: disposeBag)
+
+        tableView.rx.modelSelected(Data.self)
+            .bind(with: self) { owner, data in
+                print(data.classId)
             }
             .disposed(by: disposeBag)
     }
