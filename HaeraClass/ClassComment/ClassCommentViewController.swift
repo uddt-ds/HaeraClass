@@ -64,19 +64,27 @@ final class ClassCommentViewController: BaseViewController {
 //MARK: Rx Binding
 extension ClassCommentViewController {
     private func bind() {
-        let input = ClassCommentViewModel.Input(viewDidLoadTrigger: .just(()))
+
+        let deleteTapped = PublishRelay<Void>()
+
+        let input = ClassCommentViewModel.Input(viewDidLoadTrigger: .just(()), deleteTapped: deleteTapped)
 
         let output = viewModel.transform(input: input)
 
         output.commentData
             .bind(to: tableView.rx.items(cellIdentifier: CommentCell.identifier, cellType: CommentCell.self)) { (row, element, cell) in
                 cell.configureCell(element)
+                print(element)
                 cell.dotButtonHidden(!(output.currentUserId.value == element.creator.userID))
                 cell.rx.dotButtonTapped
                     .bind(with: self) { owner, _ in
-                        let viewModel = CommentEditViewModel(navTitle: "댓글 수정", classTitleValue: owner.viewModel.className)
-                        let vc = CommentEditViewController(viewModel: viewModel)
-                        owner.navigationController?.pushViewController(vc, animated: true)
+                        AlertManager.shared.makeActionSheet {
+                            let viewModel = CommentEditViewModel(navTitle: "댓글 수정", classTitleValue: owner.viewModel.className)
+                            let vc = CommentEditViewController(viewModel: viewModel)
+                            owner.navigationController?.pushViewController(vc, animated: true)
+                        } cancelHandler: {
+                            deleteTapped.accept(())
+                        }
                     }
                     .disposed(by: cell.disposeBag)
             }

@@ -28,6 +28,7 @@ final class ClassCommentViewModel: ViewModelProtocol {
 
     struct Input {
         let viewDidLoadTrigger: Observable<Void>
+        let deleteTapped: PublishRelay<Void>
     }
 
     struct Output {
@@ -53,12 +54,27 @@ final class ClassCommentViewModel: ViewModelProtocol {
                 switch responseData {
                 case .success(let value):
                     commentData.accept(value.data)
+                    print(value)
                 case .failure(let error):
                     print(error)
                 }
             }
             .disposed(by: disposeBag)
 
+        input.deleteTapped
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                return owner.networkManager.fetchData(router: .commentDelete(classId: owner.classId, commentId: "68bac6fb0d44b0af2863eb98"), type: Comment.self)
+            }
+            .bind(with: self) { owner, responseData in
+                switch responseData {
+                case .success(let value):
+                    commentData.accept(value.data)
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
 
         return Output(commentData: commentData, currentUserId: currentUserId)
     }
