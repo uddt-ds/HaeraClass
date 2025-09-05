@@ -74,7 +74,8 @@ extension ClassCommentViewController {
                 cell.dotButtonHidden(!(output.currentUserId.value == element.creator.userID))
                 cell.rx.dotButtonTapped
                     .bind(with: self) { owner, _ in
-                        let vc = CommentEditViewController(navTitle: "댓글 수정", classTitleValue: owner.viewModel.className)
+                        let viewModel = CommentEditViewModel(navTitle: "댓글 수정", classTitleValue: owner.viewModel.className)
+                        let vc = CommentEditViewController(viewModel: viewModel)
                         owner.navigationController?.pushViewController(vc, animated: true)
                     }
                     .disposed(by: cell.disposeBag)
@@ -83,7 +84,8 @@ extension ClassCommentViewController {
 
         rightBarButton.rx.tap
             .bind(with: self) { owner, _ in
-                let vc = CommentEditViewController(navTitle: "댓글 작성", classTitleValue: owner.viewModel.className)
+                let viewModel = CommentEditViewModel(navTitle: "댓글 작성", classTitleValue: owner.viewModel.className)
+                let vc = CommentEditViewController(viewModel: viewModel)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)

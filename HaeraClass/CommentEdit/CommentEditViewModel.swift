@@ -11,16 +11,28 @@ import RxCocoa
 
 final class CommentEditViewModel: ViewModelProtocol {
 
+    let navTitle: String
+    let classTitleValue: String
+
+    let networkManager = NetworkManager.shared
+
     var disposeBag = DisposeBag()
+
+    init(navTitle: String, classTitleValue: String) {
+        self.navTitle = navTitle
+        self.classTitleValue = classTitleValue
+    }
 
     struct Input {
         let textField: ControlProperty<String>
+        let saveButtonTap: ControlEvent<Void>
     }
 
     struct Output {
         let textCount: BehaviorRelay<String>
         let textColor: BehaviorRelay<String>
         let saveButtonState: BehaviorRelay<Bool>
+        let isSaved: BehaviorRelay<Bool>
     }
 
     func transform(input: Input) -> Output {
@@ -30,6 +42,8 @@ final class CommentEditViewModel: ViewModelProtocol {
         let textCount = BehaviorRelay(value: "0 / \(maxCount)")
         let textColor = BehaviorRelay(value: "")
         let saveButtonState = BehaviorRelay(value: false)
+
+        let isSaved = BehaviorRelay(value: false)
 
         let textField = input.textField
             .distinctUntilChanged()
@@ -82,7 +96,28 @@ final class CommentEditViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
-        return Output(textCount: textCount, textColor: textColor, saveButtonState: saveButtonState)
+        input.saveButtonTap
+            .withLatestFrom(input.textField)
+            .withUnretained(self)
+            .flatMap { owner, value in
+                if owner.navTitle == "댓글 작성" {
+                    return owner.networkManager.fetchData(router: .commentEdit(classId: "68b41df90d44b0af286346a6", editString: value), type: CommentData.self)
+                } else {
+                    return owner.networkManager.fetchData(router: .commentRevise(classId: "68b41df90d44b0af286346a6", commentId: "68ba90b60d44b0af2863ca9b", content: value), type: CommentData.self)
+                }
+            }
+            .bind(with: self) { owner, responseData in
+                switch responseData {
+                case .success(_):
+                    isSaved.accept(true)
+                case .failure(let error):
+                    isSaved.accept(false)
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
+
+        return Output(textCount: textCount, textColor: textColor, saveButtonState: saveButtonState, isSaved: isSaved)
     }
 
     private func getOnlyTextCount(_ text: String) -> Int {

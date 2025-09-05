@@ -13,14 +13,15 @@ import RxCocoa
 final class CommentEditViewController: BaseViewController {
 
     let placeHolder = "댓글을 작성해주세요"
-
-    let navTitle: String
-    let classTitleValue: String
-
     let disposeBag = DisposeBag()
 
-    private let viewModel = CommentEditViewModel()
+    let viewModel: CommentEditViewModel
 
+    init(viewModel: CommentEditViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
+    
     private let categoryTag: UIButton = {
         let button = UIButton()
         button.setTitle("테스트", for: .normal)
@@ -76,12 +77,6 @@ final class CommentEditViewController: BaseViewController {
         return button
     }()
 
-    init(navTitle: String, classTitleValue: String) {
-        self.navTitle = navTitle
-        self.classTitleValue = classTitleValue
-        super.init(nibName: nil, bundle: nil)
-    }
-
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
@@ -125,7 +120,7 @@ final class CommentEditViewController: BaseViewController {
     }
 
     private func setupNav() {
-        navigationItem.title = navTitle
+        navigationItem.title = viewModel.navTitle
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: saveButton)
         navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
     }
@@ -143,7 +138,7 @@ final class CommentEditViewController: BaseViewController {
 extension CommentEditViewController: UIScrollViewDelegate {
     private func bind() {
         
-        let input = CommentEditViewModel.Input(textField: textView.rx.text.orEmpty)
+        let input = CommentEditViewModel.Input(textField: textView.rx.text.orEmpty, saveButtonTap: saveButton.rx.tap)
 
         let output = viewModel.transform(input: input)
 
@@ -168,9 +163,11 @@ extension CommentEditViewController: UIScrollViewDelegate {
             }
             .disposed(by: disposeBag)
 
-        saveButton.rx.tap
-            .bind(with: self) { owner, _ in
-                print("버튼 눌렸습니다")
+        output.isSaved
+            .bind(with: self) { owner, value in
+                if value {
+                    owner.navigationController?.popViewController(animated: true)
+                }
             }
             .disposed(by: disposeBag)
 
