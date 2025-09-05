@@ -8,6 +8,7 @@
 import Foundation
 import RxSwift
 import RxCocoa
+import Alamofire
 
 final class LoginViewModel: ViewModelProtocol {
 
@@ -38,13 +39,12 @@ final class LoginViewModel: ViewModelProtocol {
 
         textFieldInput
             .map { result in
-                let idField = result.0
-                let pwField = result.1
-                if idField.count < 1 && idField.count < 1 {
+                let (id, pw) = result
+                if id.count < 1 && pw.count < 1 {
                     return "이메일과 비밀번호를 입력해주세요"
-                } else if !(idField.contains("@") && idField.contains(".com")) {
+                } else if !(id.contains("@") && id.contains(".com")) {
                     return "@와 .com을 포함해주세요"
-                } else if !(pwField.count >= 2 && pwField.count < 10) {
+                } else if !(pw.count >= 2 && pw.count < 10) {
                     return "2글자 이상 10글자 미만의 비밀번호를 설정해주세요"
                 } else {
                     return ""
@@ -57,16 +57,18 @@ final class LoginViewModel: ViewModelProtocol {
             .withLatestFrom(textFieldInput)
             .withUnretained(self)
             .debug()
-            .flatMap { owner, value in
-                owner.networkManager.fetchData(router: .login(email: value.0, pw: value.1), type: Login.self)
+            .flatMap { owner, value -> Single<Result<Login, AFError>> in
+                let (id, pw) = value
+                return owner.networkManager.fetchData(router: .login(email: id, pw: pw), type: Login.self)
             }
             .bind(with: self) { owner, result in
                 switch result {
                 case .success(let data):
                     loginValue.accept(data)
+                    UserDefaults.standard.set(data.userId, forKey: "userId")
                     UserDefaults.standard.set(data.accessToken, forKey: "token")
                 case .failure(let error):
-                    print(error.localizedDescription)
+                    print(error)
                 }
             }
             .disposed(by: disposeBag)
