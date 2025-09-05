@@ -10,13 +10,6 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-struct Dummy2 {
-    let place: String
-    let time: String
-    let people: String
-    let intro: String
-}
-
 final class ClassDetailViewController: BaseViewController {
 
     let disposeBag = DisposeBag()
@@ -105,6 +98,7 @@ final class ClassDetailViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
+        setupNavigation(viewModel.className)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -204,6 +198,10 @@ final class ClassDetailViewController: BaseViewController {
             commentButton.backgroundColor = ColorSet.darkGray.color
         }
     }
+
+    private func setupNavigation(_ title: String) {
+        navigationItem.title = title
+    }
 }
 
 extension ClassDetailViewController {
@@ -224,7 +222,7 @@ extension ClassDetailViewController {
 extension ClassDetailViewController {
     private func bind() {
 
-        let input = ClassDetailViewModel.Input(viewDidLoadTrigger: Observable.just(()))
+        let input = ClassDetailViewModel.Input(viewDidLoadTrigger: Observable.just(()), commentButtonTap: commentButton.rx.tap)
 
         let output = viewModel.transform(input: input)
 
@@ -238,6 +236,14 @@ extension ClassDetailViewController {
             .bind(with: self) { owner, value in
                 owner.changeButtonState(value.data.count > 0)
                 owner.commentButton.setTitle("댓글보기 (\(value.data.count))", for: .normal)
+            }
+            .disposed(by: disposeBag)
+
+        output.selectedClassId
+            .bind(with: self) { owner, value in
+                let viewModel = ClassCommentViewModel(classId: value, className: owner.viewModel.className)
+                let vc = ClassCommentViewController(viewModel: viewModel)
+                owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
     }

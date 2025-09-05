@@ -12,6 +12,7 @@ import RxCocoa
 final class ClassDetailViewModel: ViewModelProtocol {
 
     private let classId: String
+    let className: String
 
     private var disposeBag = DisposeBag()
 
@@ -19,17 +20,20 @@ final class ClassDetailViewModel: ViewModelProtocol {
 
     struct Input {
         let viewDidLoadTrigger: Observable<Void>
+        let commentButtonTap: ControlEvent<Void>
     }
 
     struct Output {
         let detailData: PublishRelay<ClassDetail>
         let commentData: PublishRelay<Comment>
+        let selectedClassId: PublishRelay<String>
     }
 
     func transform(input: Input) -> Output {
 
         let detailData = PublishRelay<ClassDetail>()
         let commentData = PublishRelay<Comment>()
+        let selectedClassId = PublishRelay<String>()
 
         let viewDidLoad = input.viewDidLoadTrigger
             .share()
@@ -57,7 +61,6 @@ final class ClassDetailViewModel: ViewModelProtocol {
             .bind(with: self) { owner, responseData in
                 switch responseData {
                 case .success(let data):
-                    print(data)
                     commentData.accept(data)
                 case .failure(let error):
                     print(error)
@@ -65,10 +68,19 @@ final class ClassDetailViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
-        return Output(detailData: detailData, commentData: commentData)
+        input.commentButtonTap
+            .bind(with: self) { owner, _ in
+                selectedClassId.accept(owner.classId)
+            }
+            .disposed(by: disposeBag)
+
+
+
+        return Output(detailData: detailData, commentData: commentData, selectedClassId: selectedClassId)
     }
 
-    init(classId: String) {
+    init(classId: String, className: String) {
         self.classId = classId
+        self.className = className
     }
 }
