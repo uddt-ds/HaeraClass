@@ -109,7 +109,14 @@ extension ClassSearchViewController {
             .bind(with: self) { owner, data in
                 let viewModel = ClassDetailViewModel(classId: data.classId, className: data.title)
                 let vc = ClassDetailViewController(viewModel: viewModel)
+                owner.navigationItem.backButtonTitle = ""
                 owner.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
+
+        searchBar.rx.searchButtonClicked
+            .bind(with: self) { owner, _ in
+                owner.view.endEditing(true)
             }
             .disposed(by: disposeBag)
     }
