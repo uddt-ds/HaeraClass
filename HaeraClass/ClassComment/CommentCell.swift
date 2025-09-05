@@ -99,7 +99,6 @@ final class CommentCell: BaseTableViewCell, ReusableViewProtocol {
         return stackView
     }()
 
-
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
     }
@@ -145,5 +144,9 @@ final class CommentCell: BaseTableViewCell, ReusableViewProtocol {
         nickLabel.text = data.creator.nick
         timeLabel.text = data.createdAt
         commentLabel.text = data.content
+    }
+
+    func dotButtonHidden(_ isHidden: Bool) {
+        dotButton.isHidden = isHidden
     }
 }

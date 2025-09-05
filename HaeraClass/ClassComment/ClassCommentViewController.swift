@@ -13,13 +13,12 @@ final class ClassCommentViewController: BaseViewController {
 
     var disposeBag = DisposeBag()
 
-    let dummy: [CommentData] = [
-        .init(commentId: "", content: "1빠", createdAt: "0분전", creator: .init(userID: "", nick: "내이름", profileImage: "")),
-        .init(commentId: "", content: "안녕하세요! 또또 커밋봇이에요! 🤖 솔직히 말씀해보세요, 여러분. 저 기다리고 있었죠?^____^ 저도 알아요😉🤣 사실 저도... 무슨 멘트를 써야 재밌을지 고민하고 있었어요🤔 벗뜨... 고민은 커밋만 늦출 뿐! 일단 커밋 할까요? ✅빠", createdAt: "0분전", creator: .init(userID: "", nick: "내이름은 뭐입니다", profileImage: "")),
-        .init(commentId: "", content: "댓글 수정 테스트", createdAt: "2분전", creator: .init(userID: "", nick: "Stianidt", profileImage: ""))
-    ]
+    let viewModel: ClassCommentViewModel
 
-    lazy var dummies = Observable.just(dummy)
+    init(viewModel: ClassCommentViewModel) {
+        self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
+    }
 
     private let tableView: UITableView = {
         let table = UITableView()
@@ -27,9 +26,16 @@ final class ClassCommentViewController: BaseViewController {
         return table
     }()
 
+    private let rightBarButton: UIButton = {
+        let button = UIButton()
+        button.setImage(.comment, for: .normal)
+        return button
+    }()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
+        setupNavigation(viewModel.className)
     }
 
     override func configureHierarchy() {
@@ -48,14 +54,30 @@ final class ClassCommentViewController: BaseViewController {
     override func configureView() {
         super.configureView()
     }
+
+    private func setupNavigation(_ title: String) {
+        navigationItem.title = title
+        navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightBarButton)
+    }
 }
 
 //MARK: Rx Binding
 extension ClassCommentViewController {
     private func bind() {
-        dummies
+        let input = ClassCommentViewModel.Input(viewDidLoadTrigger: .just(()))
+
+        let output = viewModel.transform(input: input)
+
+        output.commentData
             .bind(to: tableView.rx.items(cellIdentifier: CommentCell.identifier, cellType: CommentCell.self)) { (row, element, cell) in
                 cell.configureCell(element)
+                cell.dotButtonHidden(!(output.currentUserId.value == element.creator.userID))
+            }
+            .disposed(by: disposeBag)
+
+        rightBarButton.rx.tap
+            .bind(with: self) { owner, _ in
+                print("버튼 눌림")
             }
             .disposed(by: disposeBag)
     }
