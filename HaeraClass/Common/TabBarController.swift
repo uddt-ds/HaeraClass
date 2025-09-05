@@ -11,7 +11,7 @@ final class TabBarController: UITabBarController {
 
     private var firstVC = ClassCheckViewController()
     private var secondVC = ClassSearchViewController()
-    private var thirdVC = ViewController()    // TODO: settingVC로 변경
+    private var thirdVC = SettingViewController() 
 
     private lazy var firstNav = UINavigationController(rootViewController: firstVC)
     private lazy var secondNav = UINavigationController(rootViewController: secondVC)
