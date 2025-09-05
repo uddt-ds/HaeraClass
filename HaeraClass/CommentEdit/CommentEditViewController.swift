@@ -69,6 +69,13 @@ final class CommentEditViewController: BaseViewController {
         return button
     }()
 
+    private let closeButton: UIButton = {
+        let button = UIButton()
+        button.setImage(ImageSet.xmark.image, for: .normal)
+        button.tintColor = .black
+        return button
+    }()
+
     init(navTitle: String, classTitleValue: String) {
         self.navTitle = navTitle
         self.classTitleValue = classTitleValue
@@ -118,8 +125,9 @@ final class CommentEditViewController: BaseViewController {
     }
 
     private func setupNav() {
-
+        navigationItem.title = navTitle
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: saveButton)
+        navigationItem.leftBarButtonItem = UIBarButtonItem(customView: closeButton)
     }
 
     func updateButton(isEnable: Bool) {
@@ -163,6 +171,12 @@ extension CommentEditViewController: UIScrollViewDelegate {
         saveButton.rx.tap
             .bind(with: self) { owner, _ in
                 print("버튼 눌렸습니다")
+            }
+            .disposed(by: disposeBag)
+
+        closeButton.rx.tap
+            .bind(with: self) { owner, _ in
+                owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
     }
