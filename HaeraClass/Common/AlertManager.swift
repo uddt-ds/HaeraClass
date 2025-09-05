@@ -12,7 +12,7 @@ final class AlertManager {
 
     private init() { }
 
-    func showLogoutAlert(_ title: String) {
+    func showLogoutAlert(_ title: String, logoutHandler: (() -> Void)?) {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                 let sceneDelegate = windowScene.delegate as? SceneDelegate else { return }
 
@@ -21,7 +21,7 @@ final class AlertManager {
         let alert = UIAlertController(title: "확인", message: title, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "네", style: .default) { _ in
             //여기서 데이터 삭제
-            print("눌렸습니다")
+            logoutHandler?()
         }
         let noAction = UIAlertAction(title: "아니요", style: .default)
         alert.addAction(okAction)

@@ -55,8 +55,13 @@ extension SettingViewController {
 
         logoutButton.rx.tap
             .bind(with: self) { owner, _ in
-                print("buttonTapped")
-                owner.alertManager.showLogoutAlert("정말 로그아웃 하시겠습니까?")
+                owner.alertManager.showLogoutAlert("정말 로그아웃 하시겠습니까?") {
+                    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                          let sceneDelegate = windowScene.delegate as? SceneDelegate else { return }
+                    let vc = LoginViewController()
+                    sceneDelegate.window?.rootViewController = vc
+                    sceneDelegate.window?.makeKeyAndVisible()
+                }
             }
             .disposed(by: disposeBag)
     }
