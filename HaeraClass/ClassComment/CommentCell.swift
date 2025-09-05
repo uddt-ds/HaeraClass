@@ -6,8 +6,12 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 final class CommentCell: BaseTableViewCell, ReusableViewProtocol {
+
+    var disposeBag = DisposeBag()
 
     private let profileImageView: UIImageView = {
         let imageView = UIImageView()
@@ -34,7 +38,7 @@ final class CommentCell: BaseTableViewCell, ReusableViewProtocol {
         return label
     }()
 
-    private let dotButton: UIButton = {
+    fileprivate let dotButton: UIButton = {
         let button = UIButton()
         button.setImage(ImageSet.ellipsis.image, for: .normal)
         button.tintColor = ColorSet.darkGray.color
@@ -140,7 +144,7 @@ final class CommentCell: BaseTableViewCell, ReusableViewProtocol {
     }
 
     func configureCell(_ data: CommentData) {
-//        profileImageView.image = ""
+        //        profileImageView.image = ""
         nickLabel.text = data.creator.nick
         timeLabel.text = data.createdAt
         commentLabel.text = data.content
@@ -148,5 +152,16 @@ final class CommentCell: BaseTableViewCell, ReusableViewProtocol {
 
     func dotButtonHidden(_ isHidden: Bool) {
         dotButton.isHidden = isHidden
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        disposeBag = DisposeBag()
+    }
+}
+
+extension Reactive where Base: CommentCell {
+    var dotButtonTapped: ControlEvent<Void> {
+        return base.dotButton.rx.tap
     }
 }
