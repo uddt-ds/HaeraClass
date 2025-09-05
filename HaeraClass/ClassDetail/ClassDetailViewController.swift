@@ -107,12 +107,6 @@ final class ClassDetailViewController: BaseViewController {
         tabBarController?.tabBar.isHidden = true
     }
 
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        tabBarController?.tabBar.isHidden = false
-    }
-
     override func configureHierarchy() {
         super.configureHierarchy()
         underBarBgView.addSubview(stackView)
@@ -243,6 +237,7 @@ extension ClassDetailViewController {
             .bind(with: self) { owner, value in
                 let viewModel = ClassCommentViewModel(classId: value, className: owner.viewModel.className)
                 let vc = ClassCommentViewController(viewModel: viewModel)
+                owner.navigationItem.backButtonTitle = ""
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)

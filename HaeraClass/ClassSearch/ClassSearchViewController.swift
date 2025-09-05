@@ -46,6 +46,13 @@ final class ClassSearchViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
+        setupNav()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        tabBarController?.tabBar.isHidden = false
     }
 
     override func configureHierarchy() {
@@ -73,6 +80,10 @@ final class ClassSearchViewController: BaseViewController {
 
     override func configureView() {
         super.configureView()
+    }
+
+    private func setupNav() {
+        navigationController?.navigationBar.tintColor = .black
     }
 }
 
