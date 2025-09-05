@@ -42,4 +42,26 @@ final class AlertManager {
 
         rootVC.present(alert, animated: true)
     }
+
+    func makeActionSheet(editHandler: (() -> Void)?, cancelHandler: (() -> Void)?) {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                let sceneDelegate = windowScene.delegate as? SceneDelegate else { return }
+
+        guard let rootVC = sceneDelegate.window?.rootViewController else { return }
+
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        let editAction = UIAlertAction(title: "댓글 수정", style: .default) { _ in
+            editHandler?()
+        }
+        let deleteAction = UIAlertAction(title: "댓글 삭제", style: .destructive) { _ in
+            cancelHandler?()
+        }
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel)
+
+        actionSheet.addAction(editAction)
+        actionSheet.addAction(deleteAction)
+        actionSheet.addAction(cancelAction)
+
+        rootVC.present(actionSheet, animated: true)
+    }
 }
