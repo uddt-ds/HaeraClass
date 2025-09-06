@@ -10,7 +10,7 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-final class ClassCategoryCell: UICollectionViewCell, ReusableViewProtocol {
+final class ClassCategoryCell: BaseCollectionViewCell, ReusableViewProtocol {
 
     let disposeBag = DisposeBag()
 
@@ -29,33 +29,29 @@ final class ClassCategoryCell: UICollectionViewCell, ReusableViewProtocol {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        configureHierarchy()
-        configureLayout()
-        configureView()
     }
 
-    @available(*, unavailable)
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-    }
-
-    private func configureHierarchy() {
+    override func configureHierarchy() {
+        super.configureHierarchy()
         [button].forEach { contentView.addSubview($0) }
     }
 
-    private func configureLayout() {
+    override func configureLayout() {
+        super.configureLayout()
         button.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }
 
-    private func configureView() {
+    override func configureView() {
+        super.configureView()
         contentView.backgroundColor = .clear
         backgroundColor = .clear
     }
 
-    func configureCell(with data: String) {
+    func configureCell(with data: String, tag: Int) {
         button.setTitle(data, for: .normal)
+        button.tag = tag
     }
 
     func changeButtonState() {
@@ -69,9 +65,10 @@ final class ClassCategoryCell: UICollectionViewCell, ReusableViewProtocol {
     }
 
 }
-//
-//extension Reactive where Base: ClassCategoryCell {
-//    var buttonTap: ControlEvent<Void> {
-//        return base.button.rx.tap
-//    }
-//}
+
+extension Reactive where Base: ClassCategoryCell {
+    var buttonTag: Observable<Int> {
+        return base.button.rx.tap
+            .map { base.button.tag }
+    }
+}

@@ -14,8 +14,8 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
     private let classImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
+        imageView.layer.cornerRadius = 12
         imageView.clipsToBounds = true
-        imageView.image = .noProfile
         return imageView
     }()
 

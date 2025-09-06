@@ -10,15 +10,6 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-struct Dummy {
-    let image: UIImage
-    let header: String
-    let category: String
-    let description: String
-    let salePrice: String
-    let price: String
-    let persent: String
-}
 
 final class ClassCheckViewController: BaseViewController {
 
@@ -64,7 +55,13 @@ final class ClassCheckViewController: BaseViewController {
         bind()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tabBarController?.tabBar.isHidden = false
+    }
+
     override func configureHierarchy() {
+        super.configureHierarchy()
         [collectionView, stackView, tableView].forEach { view.addSubview($0) }
     }
 
@@ -106,7 +103,9 @@ extension ClassCheckViewController {
 
         let buttonState = BehaviorRelay(value: false)
 
-        let input = ClassCheckViewModel.Input(initialSet: Observable.just(()), categoryButtonTap: collectionView.rx.itemSelected, currentButtonState: buttonState, sortButtonTap: sortButton.rx.tap)
+        let selectedCategory = BehaviorRelay(value: 0)
+
+        let input = ClassCheckViewModel.Input(initialSet: Observable.just(()), selectedCategory: selectedCategory, currentButtonState: buttonState, sortButtonTap: sortButton.rx.tap)
 
         let output = viewModel.transform(input: input)
 
@@ -123,7 +122,13 @@ extension ClassCheckViewController {
         output.buttonItems
             .bind(to: collectionView.rx.items(cellIdentifier: ClassCategoryCell.identifier,cellType: ClassCategoryCell.self)) {
                 (row, element, cell) in
-                cell.configureCell(with: element.title)
+                cell.configureCell(with: element.title, tag: element.rawValue)
+                cell.rx.buttonTag
+                    .bind(with: self) { owner, value in
+                        cell.changeButtonState()
+                        selectedCategory.accept(value)
+                    }
+                    .disposed(by: cell.disposeBag)
             }
             .disposed(by: disposeBag)
 
@@ -134,7 +139,15 @@ extension ClassCheckViewController {
             }
             .disposed(by: disposeBag)
 
-        //TODO: collectionView 버튼 선택 기능 구현 필요
+        tableView.rx.modelSelected(Data.self)
+            .bind(with: self) { owner, data in
+                let viewModel = ClassDetailViewModel(classId: data.classId, className: data.title)
+                let vc = ClassDetailViewController(viewModel: viewModel)
+                owner.navigationItem.backButtonTitle = ""
+                owner.navigationController?.navigationBar.tintColor = .black
+                owner.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
     }
 
 }

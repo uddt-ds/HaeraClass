@@ -18,9 +18,13 @@ final class ClassCheckViewModel: ViewModelProtocol {
 
     struct Input {
         let initialSet: Observable<Void>
-        let categoryButtonTap: ControlEvent<IndexPath>
+        let selectedCategory: BehaviorRelay<Int>
         let currentButtonState: BehaviorRelay<Bool>
         let sortButtonTap: ControlEvent<Void>
+    }
+
+    struct State {
+        let totalData: BehaviorRelay<[Data]>
     }
 
     struct Output {
@@ -31,7 +35,11 @@ final class ClassCheckViewModel: ViewModelProtocol {
 
     func transform(input: Input) -> Output {
 
-        let buttonItems: BehaviorRelay<[CategoryTitle]> = .init(value: CategoryTitle.allCases)
+        let buttonTitles = CategoryTitle.allCases
+
+        let buttonItems: BehaviorRelay<[CategoryTitle]> = .init(value: buttonTitles)
+
+        let state = State(totalData: .init(value: []))
 
         let selectedData: BehaviorRelay<[Data]> = BehaviorRelay(value: [])
         let totalCount = PublishRelay<String>()
@@ -44,6 +52,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
             .bind(with: self) { owner, value in
                 switch value {
                 case .success(let response):
+                    state.totalData.accept(response.data)
                     selectedData.accept(response.data)
                     let totalTitle = "\(response.data.count)개"
                     totalCount.accept(totalTitle)
@@ -75,21 +84,17 @@ final class ClassCheckViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
-        input.categoryButtonTap
-            .debug()
+        input.selectedCategory
             .bind(with: self) { owner, value in
-                let data = selectedData.value.filter { $0.category == CategoryTitle.allCases[value.row].rawValue }
-                selectedData.accept(data)
-                print(data)
+                if value != 0 {
+                    let data = state.totalData.value.filter { $0.category == value }
+                    selectedData.accept(data)
+                } else {
+                    selectedData.accept(state.totalData.value)
+                }
             }
             .disposed(by: disposeBag)
-
-        input.categoryButtonTap
-            .bind(with: self) { owner, value in
-                print(value)
-            }
-            .disposed(by: disposeBag)
-
+        
         return Output(selectedData: selectedData, totalCount: totalCount, buttonItems: buttonItems)
     }
 }
