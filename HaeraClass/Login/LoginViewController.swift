@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
+import RxGesture
 
 final class LoginViewController: BaseViewController {
 
@@ -36,6 +37,7 @@ final class LoginViewController: BaseViewController {
                           borderColor: ColorSet.orange.color.cgColor,
                           borderWidth: 2,
                           radius: 10)
+        txtField.keyboardType = .emailAddress
         txtField.becomeFirstResponder()
         return txtField
     }()
@@ -54,6 +56,7 @@ final class LoginViewController: BaseViewController {
                           borderColor: ColorSet.orange.color.cgColor,
                           borderWidth: 2,
                           radius: 10)
+        txtField.isSecureTextEntry = true
         return txtField
     }()
 
@@ -74,6 +77,7 @@ final class LoginViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
+        bindGesture()
     }
 
     override func configureHierarchy() {
@@ -179,6 +183,15 @@ extension LoginViewController {
             .bind(with: self, onNext: { owner, value in
                 owner.buttonState(value)
             })
+            .disposed(by: disposeBag)
+    }
+
+    private func bindGesture() {
+        view.rx.tapGesture()
+            .bind(with: self) { owner, _ in
+                owner.view.endEditing(true)
+                owner.resignFirstResponder()
+            }
             .disposed(by: disposeBag)
     }
 }

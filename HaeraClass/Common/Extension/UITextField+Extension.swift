@@ -17,5 +17,7 @@ extension UITextField {
         layer.borderColor = borderColor
         layer.borderWidth = borderWidth
         layer.cornerRadius = radius
+        autocorrectionType = .no
+        autocapitalizationType = .none
     }
 }
