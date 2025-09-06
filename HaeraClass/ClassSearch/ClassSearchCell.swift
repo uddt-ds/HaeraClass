@@ -5,10 +5,14 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 import SnapKit
 import Kingfisher
 
 final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
+
+    let disposeBag = DisposeBag()
 
     private let classImageView: UIImageView = {
         let imageView = UIImageView()
@@ -63,7 +67,7 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
         return label
     }()
 
-    private let heartButton: UIButton = {
+    fileprivate let heartButton: UIButton = {
         let button = UIButton()
         button.setImage(.likeButton, for: .normal)
         button.setImage(.likeButtonFill, for: .selected)
@@ -123,6 +127,17 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
         super.configureView()
     }
 
+    func updateHeartButton() {
+        heartButton.isSelected.toggle()
+        if heartButton.isSelected {
+            heartButton.setImage(.likeButtonFill, for: .normal)
+        } else {
+            heartButton.setImage(.likeButton, for: .normal)
+        }
+        print(heartButton.isSelected)
+    }
+
+
     func configureCell(with data: Data) {
         guard let headerKey = Bundle.main.object(forInfoDictionaryKey: "SesacKey") as? String else { return }
 
@@ -149,6 +164,17 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
         } else {
             rawPrice.isHidden = false
         }
+
+//        heartButton.isSelected = data.isLiked
+        //하트 버튼을 눌렀을 때, UI는 기본적으로 변하게 하기
+        //하트 버튼을 눌렀을 때 서버와 통신해서 Boolean 값 변경하기
+        //String message는 별도로 처리해야하는데 하나씩 순서대로 처리
+    }
+}
+
+extension Reactive where Base: ClassSearchCell {
+    var heartButtonTap: ControlEvent<Void> {
+        return base.heartButton.rx.tap
     }
 }
 

@@ -91,13 +91,26 @@ final class ClassSearchViewController: BaseViewController {
 extension ClassSearchViewController {
     private func bind() {
 
-        let input = ClassSearchViewModel.Input(searchText: searchBar.rx.text.orEmpty, searchButtonTapped: searchBar.rx.searchButtonClicked)
+        let heartButtonTap = PublishSubject<(String, Bool)>()
+
+        let input = ClassSearchViewModel.Input(searchText: searchBar.rx.text.orEmpty, searchButtonTapped: searchBar.rx.searchButtonClicked, heartButtonTapped: heartButtonTap)
 
         let output = viewModel.transform(input: input)
 
         output.searchResult
             .bind(to: tableView.rx.items(cellIdentifier: ClassSearchCell.identifier, cellType: ClassSearchCell.self)) { (row, element, cell) in
                 cell.configureCell(with: element)
+                cell.rx.heartButtonTap
+                    .bind(with: self) { owner, _ in
+                        cell.updateHeartButton()
+                    }
+                    .disposed(by: cell.disposeBag)
+//                cell.rx.heartButtonTap
+//                    .map { value in
+//                        return (element.classId, value)
+//                    }
+//                    .bind(to: heartButtonTap)
+//                    .disposed(by: cell.disposeBag)
             }
             .disposed(by: disposeBag)
 
@@ -117,6 +130,12 @@ extension ClassSearchViewController {
         searchBar.rx.searchButtonClicked
             .bind(with: self) { owner, _ in
                 owner.view.endEditing(true)
+            }
+            .disposed(by: disposeBag)
+
+        output.saveResult
+            .bind(with: self) { owner, value in
+                print(value)
             }
             .disposed(by: disposeBag)
     }

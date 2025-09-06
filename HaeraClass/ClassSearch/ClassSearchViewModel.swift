@@ -18,18 +18,22 @@ final class ClassSearchViewModel: ViewModelProtocol {
     struct Input {
         let searchText: ControlProperty<String>
         let searchButtonTapped:  ControlEvent<Void>
+        let heartButtonTapped: PublishSubject<(String, Bool)>
     }
+
 
     struct Output {
         let searchResult: PublishRelay<[Data]>
         let searchResultLabel: BehaviorRelay<String>
+        let saveResult: PublishRelay<String>
     }
-
 
     func transform(input: Input) -> Output {
 
         let searchResult = PublishRelay<[Data]>()
         let searchResultLabel = BehaviorRelay(value: "원하는 클래스가 있으신가요?")
+        let isLiked = BehaviorRelay<Bool>(value: false)
+        let saveResult = PublishRelay<String>()
 
         input.searchButtonTapped
             .withLatestFrom(input.searchText)
@@ -57,9 +61,29 @@ final class ClassSearchViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
-        return Output(searchResult: searchResult, searchResultLabel: searchResultLabel)
+        input.heartButtonTapped
+            .withUnretained(self)
+            .flatMap { owner, value in
+                let (classId, isLiked) = value
+                return owner.networkManager.fetchData(router: .likeClass(classId: classId, likeStatus: isLiked), type: Like.self)
+            }
+            .bind(with: self) { owner, responseData in
+                switch responseData {
+                case .success(let data):
+                    isLiked.accept(data.likeStatus)
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
 
+        isLiked
+            .map { $0 ? "클래스를 찜했습니다" : "클래스 찜을 취소했습니다" }
+            .bind(with: self) { owner, value in
+                saveResult.accept(value)
+            }
+            .disposed(by: disposeBag)
+
+        return Output(searchResult: searchResult, searchResultLabel: searchResultLabel, saveResult: saveResult)
     }
-
-
 }
