@@ -21,11 +21,10 @@ final class NetworkManager {
             AF.request(router.endPoint,
                        method: router.method,
                        parameters: router.parameter,
-                       encoding: JSONEncoding.default,
+                       encoding: JSONEncoding.default, 
                        headers: router.header)
             .validate(statusCode: 200..<500)
             .responseDecodable(of: T.self) { responseData in
-                print(responseData)
                 switch responseData.result {
                 case .success(let data):
                     value(.success(.success(data)))
@@ -40,6 +39,7 @@ final class NetworkManager {
     func getData<T: Decodable>(router: Router, type: T.Type) -> Single<Result<T, AFError>> {
         return Single.create { value in
             AF.request(router.endPoint,
+                       parameters: router.parameter,
                        headers: router.header)
             .validate(statusCode: 200..<500)
             .responseDecodable(of: T.self) { responseData in
