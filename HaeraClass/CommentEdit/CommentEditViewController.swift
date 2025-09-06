@@ -81,6 +81,7 @@ final class CommentEditViewController: BaseViewController {
         super.viewDidLoad()
         bind()
         setupNav()
+        setInitialText()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -135,6 +136,14 @@ final class CommentEditViewController: BaseViewController {
             saveButton.setTitleColor(.black, for: .normal)
         } else {
             saveButton.setTitleColor(ColorSet.lightGray.color, for: .normal)
+        }
+    }
+
+    //TODO: ViewModel로 보내서 처리할지 고민
+    private func setInitialText() {
+        if let text = viewModel.content {
+            textView.text = text
+            textView.textColor = .darkGray
         }
     }
 }

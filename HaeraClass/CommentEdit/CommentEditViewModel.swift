@@ -15,16 +15,18 @@ final class CommentEditViewModel: ViewModelProtocol{
     let classTitleValue: String
     let classId: String
     let commentId: String?
+    let content: String?
 
     let networkManager = NetworkManager.shared
 
     var disposeBag = DisposeBag()
 
-    init(navTitle: String, classTitleValue: String, classId: String, commentID: String? = nil) {
+    init(navTitle: String, classTitleValue: String, classId: String, commentID: String? = nil, content: String? = nil) {
         self.navTitle = navTitle
         self.classTitleValue = classTitleValue
         self.classId = classId
         self.commentId = commentID
+        self.content = content
     }
 
     struct Input {

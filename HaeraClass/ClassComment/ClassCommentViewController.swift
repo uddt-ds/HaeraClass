@@ -79,7 +79,7 @@ extension ClassCommentViewController {
                 cell.rx.dotButtonTapped
                     .bind(with: self) { owner, _ in
                         AlertManager.shared.makeActionSheet {
-                            let viewModel = CommentEditViewModel(navTitle: "댓글 수정", classTitleValue: owner.viewModel.className, classId: owner.viewModel.classId, commentID: element.commentId)
+                            let viewModel = CommentEditViewModel(navTitle: "댓글 수정", classTitleValue: owner.viewModel.className, classId: owner.viewModel.classId, commentID: element.commentId, content: element.content)
                             print(element.commentId)
                             let vc = CommentEditViewController(viewModel: viewModel)
                             owner.navigationController?.pushViewController(vc, animated: true)
