@@ -13,7 +13,7 @@ final class ClassCommentViewController: BaseViewController {
 
     var disposeBag = DisposeBag()
 
-    let viewModel: ClassCommentViewModel
+    var viewModel: ClassCommentViewModel
 
     init(viewModel: ClassCommentViewModel) {
         self.viewModel = viewModel
@@ -79,10 +79,12 @@ extension ClassCommentViewController {
                 cell.rx.dotButtonTapped
                     .bind(with: self) { owner, _ in
                         AlertManager.shared.makeActionSheet {
-                            let viewModel = CommentEditViewModel(navTitle: "댓글 수정", classTitleValue: owner.viewModel.className)
+                            let viewModel = CommentEditViewModel(navTitle: "댓글 수정", classTitleValue: owner.viewModel.className, classId: owner.viewModel.classId, commentID: element.commentId)
+                            print(element.commentId)
                             let vc = CommentEditViewController(viewModel: viewModel)
                             owner.navigationController?.pushViewController(vc, animated: true)
-                        } cancelHandler: {
+                        } deleteHanlder: {
+                            owner.viewModel.commentId = element.commentId
                             deleteTapped.accept(())
                         }
                     }
@@ -92,7 +94,7 @@ extension ClassCommentViewController {
 
         rightBarButton.rx.tap
             .bind(with: self) { owner, _ in
-                let viewModel = CommentEditViewModel(navTitle: "댓글 작성", classTitleValue: owner.viewModel.className)
+                let viewModel = CommentEditViewModel(navTitle: "댓글 작성", classTitleValue: owner.viewModel.className, classId: owner.viewModel.classId)
                 let vc = CommentEditViewController(viewModel: viewModel)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }

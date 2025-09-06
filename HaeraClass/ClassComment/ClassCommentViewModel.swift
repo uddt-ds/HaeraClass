@@ -11,9 +11,9 @@ import RxCocoa
 
 final class ClassCommentViewModel: ViewModelProtocol {
 
-    private let classId: String
-
+    let classId: String
     let className: String
+    var commentId: String
 
     let disposeBag = DisposeBag()
 
@@ -21,9 +21,10 @@ final class ClassCommentViewModel: ViewModelProtocol {
 
     let userId = UserDefaults.standard.string(forKey: "userId") ?? ""
 
-    init(classId: String, className: String) {
+    init(classId: String, className: String, commentId: String) {
         self.classId = classId
         self.className = className
+        self.commentId = commentId
     }
 
     struct Input {
@@ -54,7 +55,6 @@ final class ClassCommentViewModel: ViewModelProtocol {
                 switch responseData {
                 case .success(let value):
                     commentData.accept(value.data)
-                    print(value)
                 case .failure(let error):
                     print(error)
                 }
@@ -64,7 +64,26 @@ final class ClassCommentViewModel: ViewModelProtocol {
         input.deleteTapped
             .withUnretained(self)
             .flatMap { owner, _ in
-                return owner.networkManager.fetchData(router: .commentDelete(classId: owner.classId, commentId: "68bac6fb0d44b0af2863eb98"), type: Comment.self)
+                return owner.networkManager.fetchData(router: .commentDelete(classId: owner.classId, commentId: owner.commentId), type: Comment.self)
+            }
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                return owner.networkManager.getData(router: .commentSearch(classId: owner.classId), type: Comment.self)
+            }
+            .bind(with: self) { owner, responseData in
+                switch responseData {
+                case .success(let value):
+                    commentData.accept(value.data)
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
+
+        NotificationCenter.default.rx.notification(Notification.Name("isPop"), object: nil)
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                return owner.networkManager.getData(router: .commentSearch(classId: owner.classId), type: Comment.self)
             }
             .bind(with: self) { owner, responseData in
                 switch responseData {
