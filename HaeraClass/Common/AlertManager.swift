@@ -20,7 +20,7 @@ final class AlertManager {
 
         let alert = UIAlertController(title: "확인", message: title, preferredStyle: .alert)
         let okAction = UIAlertAction(title: "네", style: .default) { _ in
-            //여기서 데이터 삭제
+            UserDefaults.standard.removeObject(forKey: "token")
             logoutHandler?()
         }
         let noAction = UIAlertAction(title: "아니요", style: .default)
@@ -43,22 +43,22 @@ final class AlertManager {
         rootVC.present(alert, animated: true)
     }
 
-    func makeActionSheet(editHandler: (() -> Void)?, cancelHandler: (() -> Void)?) {
+    func makeActionSheet(reviseHandler: (() -> Void)?, deleteHanlder: (() -> Void)?) {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                 let sceneDelegate = windowScene.delegate as? SceneDelegate else { return }
 
         guard let rootVC = sceneDelegate.window?.rootViewController else { return }
 
         let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        let editAction = UIAlertAction(title: "댓글 수정", style: .default) { _ in
-            editHandler?()
+        let reviseAction = UIAlertAction(title: "댓글 수정", style: .default) { _ in
+            reviseHandler?()
         }
         let deleteAction = UIAlertAction(title: "댓글 삭제", style: .destructive) { _ in
-            cancelHandler?()
+            deleteHanlder?()
         }
         let cancelAction = UIAlertAction(title: "취소", style: .cancel)
 
-        actionSheet.addAction(editAction)
+        actionSheet.addAction(reviseAction)
         actionSheet.addAction(deleteAction)
         actionSheet.addAction(cancelAction)
 

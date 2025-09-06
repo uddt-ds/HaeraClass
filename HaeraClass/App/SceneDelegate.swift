@@ -16,9 +16,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
 
-        // TODO: 첫 화면 분기 
-        let vc = LoginViewController()
-        window?.rootViewController = vc
+        let token = UserDefaults.standard.string(forKey: "token")
+
+        if token == nil {
+            let vc = LoginViewController()
+            window?.rootViewController = vc
+        } else {
+            let vc = TabBarController()
+            window?.rootViewController = vc
+        }
 
         window?.makeKeyAndVisible()
     }
