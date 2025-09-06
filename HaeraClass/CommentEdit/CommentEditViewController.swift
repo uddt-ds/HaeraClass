@@ -82,6 +82,7 @@ final class CommentEditViewController: BaseViewController {
         bind()
         setupNav()
         setInitialText()
+        setInitialTitle()
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -145,6 +146,11 @@ final class CommentEditViewController: BaseViewController {
             textView.text = text
             textView.textColor = .darkGray
         }
+    }
+
+    private func setInitialTitle() {
+        classTitle.text = viewModel.classTitleValue
+        categoryTag.setTitle(CategoryTitle(rawValue: viewModel.category)?.title, for: .normal)
     }
 }
 

@@ -14,6 +14,7 @@ final class ClassCommentViewModel: ViewModelProtocol {
     let classId: String
     let className: String
     var commentId: String
+    let category: Int
 
     let disposeBag = DisposeBag()
 
@@ -21,10 +22,11 @@ final class ClassCommentViewModel: ViewModelProtocol {
 
     let userId = UserDefaults.standard.string(forKey: "userId") ?? ""
 
-    init(classId: String, className: String, commentId: String) {
+    init(classId: String, className: String, commentId: String, category: Int) {
         self.classId = classId
         self.className = className
         self.commentId = commentId
+        self.category = category
     }
 
     struct Input {

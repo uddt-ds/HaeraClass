@@ -14,6 +14,7 @@ final class CommentEditViewModel: ViewModelProtocol{
     let navTitle: String
     let classTitleValue: String
     let classId: String
+    let category: Int
     let commentId: String?
     let content: String?
 
@@ -21,10 +22,11 @@ final class CommentEditViewModel: ViewModelProtocol{
 
     var disposeBag = DisposeBag()
 
-    init(navTitle: String, classTitleValue: String, classId: String, commentID: String? = nil, content: String? = nil) {
+    init(navTitle: String, classTitleValue: String, classId: String, category: Int, commentID: String? = nil, content: String? = nil) {
         self.navTitle = navTitle
         self.classTitleValue = classTitleValue
         self.classId = classId
+        self.category = category
         self.commentId = commentID
         self.content = content
     }

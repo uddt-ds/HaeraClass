@@ -141,7 +141,7 @@ extension ClassCheckViewController {
 
         tableView.rx.modelSelected(Data.self)
             .bind(with: self) { owner, data in
-                let viewModel = ClassDetailViewModel(classId: data.classId, className: data.title)
+                let viewModel = ClassDetailViewModel(classId: data.classId, className: data.title, category: data.category)
                 let vc = ClassDetailViewController(viewModel: viewModel)
                 owner.navigationItem.backButtonTitle = ""
                 owner.navigationController?.navigationBar.tintColor = .black

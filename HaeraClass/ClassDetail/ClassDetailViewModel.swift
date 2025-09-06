@@ -13,6 +13,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
 
     private let classId: String
     let className: String
+    let category: Int
 
     private var disposeBag = DisposeBag()
 
@@ -79,8 +80,9 @@ final class ClassDetailViewModel: ViewModelProtocol {
         return Output(detailData: detailData, commentData: commentData, selectedClassId: selectedClassId)
     }
 
-    init(classId: String, className: String) {
+    init(classId: String, className: String, category: Int) {
         self.classId = classId
         self.className = className
+        self.category = category
     }
 }

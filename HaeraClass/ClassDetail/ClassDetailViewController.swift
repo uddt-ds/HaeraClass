@@ -235,7 +235,7 @@ extension ClassDetailViewController {
 
         output.selectedClassId
             .bind(with: self) { owner, value in
-                let viewModel = ClassCommentViewModel(classId: value, className: owner.viewModel.className, commentId: "")
+                let viewModel = ClassCommentViewModel(classId: value, className: owner.viewModel.className, commentId: "", category: owner.viewModel.category)
                 let vc = ClassCommentViewController(viewModel: viewModel)
                 owner.navigationItem.backButtonTitle = ""
                 owner.navigationController?.pushViewController(vc, animated: true)
