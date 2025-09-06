@@ -8,9 +8,10 @@
 import Foundation
 
 final class DateManager {
-    
+
     static let formatter = DateFormatter()
     static let formatter2 = DateFormatter()
+    static let relativeFormatter = RelativeDateTimeFormatter()
 
     private init() { }
 
@@ -21,6 +22,17 @@ final class DateManager {
         formatter2.dateFormat = "YYYY년 MM월 dd일 HH시 mm분"
         formatter2.locale = Locale(identifier: "ko_KR")
         let dateString = formatter2.string(from: date)
+        return dateString
+    }
+
+    static func getRelativeDate(value: String?) -> String {
+        formatter.dateFormat = "yyy-MM-dd'T'HH:mm:ss.SSSZ"
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        guard let date = formatter.date(from: value ?? "") else { return "" }
+        relativeFormatter.locale = Locale(identifier: "ko_KR")
+        relativeFormatter.dateTimeStyle = .named
+        relativeFormatter.unitsStyle = .short
+        let dateString = relativeFormatter.localizedString(for: date, relativeTo: .now)
         return dateString
     }
 }

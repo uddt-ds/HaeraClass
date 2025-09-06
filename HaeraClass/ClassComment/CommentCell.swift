@@ -146,7 +146,8 @@ final class CommentCell: BaseTableViewCell, ReusableViewProtocol {
     func configureCell(_ data: CommentData) {
         //        profileImageView.image = ""
         nickLabel.text = data.creator.nick
-        timeLabel.text = data.createdAt
+        let relativeTime = DateManager.getRelativeDate(value: data.createdAt)
+        timeLabel.text = relativeTime
         commentLabel.text = data.content
     }
 
