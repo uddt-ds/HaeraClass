@@ -88,8 +88,10 @@ final class ClassCheckViewModel: ViewModelProtocol {
             .bind(with: self) { owner, value in
                 if value != 0 {
                     let data = state.totalData.value.filter { $0.category == value }
+                    totalCount.accept("\(data.count)개")
                     selectedData.accept(data)
                 } else {
+                    totalCount.accept("\(state.totalData.value.count)개")
                     selectedData.accept(state.totalData.value)
                 }
             }

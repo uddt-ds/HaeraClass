@@ -50,14 +50,14 @@ extension Data {
         guard let salePrice else {
             return "무료"
         }
-        return "\(salePrice)"
+        return salePrice.demical
     }
 
     var bindPrice: String {
         guard let price else {
             return "무료"
         }
-        return "\(price)"
+        return price.demical
     }
 
     var persent: String {
