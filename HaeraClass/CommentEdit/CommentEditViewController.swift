@@ -83,6 +83,11 @@ final class CommentEditViewController: BaseViewController {
         setupNav()
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.post(name: Notification.Name("isPop"), object: nil)
+    }
+
     override func configureHierarchy() {
         super.configureHierarchy()
         [categoryTag, classTitle, textView, stringCountLabel].forEach { view.addSubview($0) }

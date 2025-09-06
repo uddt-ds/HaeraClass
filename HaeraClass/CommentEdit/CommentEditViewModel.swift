@@ -9,18 +9,22 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-final class CommentEditViewModel: ViewModelProtocol {
+final class CommentEditViewModel: ViewModelProtocol{
 
     let navTitle: String
     let classTitleValue: String
+    let classId: String
+    let commentId: String?
 
     let networkManager = NetworkManager.shared
 
     var disposeBag = DisposeBag()
 
-    init(navTitle: String, classTitleValue: String) {
+    init(navTitle: String, classTitleValue: String, classId: String, commentID: String? = nil) {
         self.navTitle = navTitle
         self.classTitleValue = classTitleValue
+        self.classId = classId
+        self.commentId = commentID
     }
 
     struct Input {
@@ -101,9 +105,9 @@ final class CommentEditViewModel: ViewModelProtocol {
             .withUnretained(self)
             .flatMap { owner, value in
                 if owner.navTitle == "댓글 작성" {
-                    return owner.networkManager.fetchData(router: .commentEdit(classId: "68b41df90d44b0af286346a6", editString: value), type: CommentData.self)
+                    return owner.networkManager.fetchData(router: .commentEdit(classId: owner.classId, editString: value), type: CommentData.self)
                 } else {
-                    return owner.networkManager.fetchData(router: .commentRevise(classId: "68b41df90d44b0af286346a6", commentId: "68ba90b60d44b0af2863ca9b", content: value), type: CommentData.self)
+                    return owner.networkManager.fetchData(router: .commentRevise(classId: owner.classId, commentId: owner.commentId ?? "", content: value), type: CommentData.self)
                 }
             }
             .bind(with: self) { owner, responseData in
