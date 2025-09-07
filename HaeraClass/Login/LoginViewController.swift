@@ -60,8 +60,8 @@ final class LoginViewController: BaseViewController {
         return txtField
     }()
 
-    private let button: CustomButton = {
-        let button = CustomButton("로그인")
+    private let button: OrangePointButton = {
+        let button = OrangePointButton("로그인")
         return button
     }()
 

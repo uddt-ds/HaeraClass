@@ -51,8 +51,8 @@ final class ClassDetailViewController: BaseViewController {
         return view
     }()
 
-    private let commentButton: CustomButton = {
-        let button = CustomButton("댓글보기 (0)")
+    private let commentButton: OrangePointButton = {
+        let button = OrangePointButton("댓글보기 (0)")
         return button
     }()
 
