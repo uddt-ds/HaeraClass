@@ -91,7 +91,9 @@ final class ClassSearchViewController: BaseViewController {
 extension ClassSearchViewController {
     private func bind() {
 
-        let heartButtonTap = PublishSubject<(String, Bool)>()
+        // 버튼이 눌렸을 때 현재 상태가 가져와짐
+
+        let heartButtonTap = BehaviorSubject(value: ("", false))
 
         let input = ClassSearchViewModel.Input(searchText: searchBar.rx.text.orEmpty, searchButtonTapped: searchBar.rx.searchButtonClicked, heartButtonTapped: heartButtonTap)
 
@@ -101,16 +103,13 @@ extension ClassSearchViewController {
             .bind(to: tableView.rx.items(cellIdentifier: ClassSearchCell.identifier, cellType: ClassSearchCell.self)) { (row, element, cell) in
                 cell.configureCell(with: element)
                 cell.rx.heartButtonTap
-                    .bind(with: self) { owner, _ in
+                    .map{ value in
+                        let changeButtonState = !value
                         cell.updateHeartButton()
+                        return (element.classId, changeButtonState)
                     }
+                    .bind(to: heartButtonTap)
                     .disposed(by: cell.disposeBag)
-//                cell.rx.heartButtonTap
-//                    .map { value in
-//                        return (element.classId, value)
-//                    }
-//                    .bind(to: heartButtonTap)
-//                    .disposed(by: cell.disposeBag)
             }
             .disposed(by: disposeBag)
 

@@ -18,7 +18,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
     struct Input {
         let searchText: ControlProperty<String>
         let searchButtonTapped:  ControlEvent<Void>
-        let heartButtonTapped: PublishSubject<(String, Bool)>
+        let heartButtonTapped: BehaviorSubject<(String, Bool)>
     }
 
 
@@ -32,7 +32,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
 
         let searchResult = PublishRelay<[Data]>()
         let searchResultLabel = BehaviorRelay(value: "원하는 클래스가 있으신가요?")
-        let isLiked = BehaviorRelay<Bool>(value: false)
+        let isLiked = PublishRelay<Bool>()
         let saveResult = PublishRelay<String>()
 
         input.searchButtonTapped
@@ -71,6 +71,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
                 switch responseData {
                 case .success(let data):
                     isLiked.accept(data.likeStatus)
+                    print(data.likeStatus)
                 case .failure(let error):
                     print(error)
                 }

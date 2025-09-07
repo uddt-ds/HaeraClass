@@ -165,7 +165,7 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
             rawPrice.isHidden = false
         }
 
-//        heartButton.isSelected = data.isLiked
+        heartButton.isSelected = data.isLiked
         //하트 버튼을 눌렀을 때, UI는 기본적으로 변하게 하기
         //하트 버튼을 눌렀을 때 서버와 통신해서 Boolean 값 변경하기
         //String message는 별도로 처리해야하는데 하나씩 순서대로 처리
@@ -173,8 +173,12 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
 }
 
 extension Reactive where Base: ClassSearchCell {
-    var heartButtonTap: ControlEvent<Void> {
+    var heartButtonTap: Observable<Bool> {
         return base.heartButton.rx.tap
+            .map {
+                print("현재 상태: ", base.heartButton.isSelected)
+                return base.heartButton.isSelected
+            }
     }
 }
 
