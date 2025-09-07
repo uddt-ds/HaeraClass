@@ -9,6 +9,7 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
+import Toast
 
 final class ClassSearchViewController: BaseViewController {
 
@@ -134,7 +135,7 @@ extension ClassSearchViewController {
 
         output.saveResult
             .bind(with: self) { owner, value in
-                print(value)
+                owner.view.makeToast(value, duration: 1.5, position: .bottom)
             }
             .disposed(by: disposeBag)
     }

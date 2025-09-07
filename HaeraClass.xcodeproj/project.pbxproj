@@ -14,6 +14,7 @@
 		9B47071E2E6810FB00284F21 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 9B47071D2E6810FB00284F21 /* Alamofire */; };
 		9B470BC82E69012700284F21 /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 9B470BC72E69012700284F21 /* Kingfisher */; };
 		9BDCEA902E6C0D9F00176417 /* RxGesture in Frameworks */ = {isa = PBXBuildFile; productRef = 9BDCEA8F2E6C0D9F00176417 /* RxGesture */; };
+		9BDCEA9B2E6DA76A00176417 /* Toast in Frameworks */ = {isa = PBXBuildFile; productRef = 9BDCEA9A2E6DA76A00176417 /* Toast */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -52,6 +53,7 @@
 				9B4703922E66E99500284F21 /* RxCocoa in Frameworks */,
 				9B47038F2E66E43200284F21 /* SnapKit in Frameworks */,
 				9BDCEA902E6C0D9F00176417 /* RxGesture in Frameworks */,
+				9BDCEA9B2E6DA76A00176417 /* Toast in Frameworks */,
 				9B470BC82E69012700284F21 /* Kingfisher in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -102,6 +104,7 @@
 				9B47071D2E6810FB00284F21 /* Alamofire */,
 				9B470BC72E69012700284F21 /* Kingfisher */,
 				9BDCEA8F2E6C0D9F00176417 /* RxGesture */,
+				9BDCEA9A2E6DA76A00176417 /* Toast */,
 			);
 			productName = HaeraClass;
 			productReference = 9B47026C2E66C9B500284F21 /* HaeraClass.app */;
@@ -137,6 +140,7 @@
 				9B47071C2E6810FB00284F21 /* XCRemoteSwiftPackageReference "Alamofire" */,
 				9B470BC62E69012700284F21 /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				9BDCEA8E2E6C0D9F00176417 /* XCRemoteSwiftPackageReference "RxGesture" */,
+				9BDCEA992E6DA76A00176417 /* XCRemoteSwiftPackageReference "Toast-Swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 9B47026D2E66C9B500284F21 /* Products */;
@@ -430,6 +434,14 @@
 				minimumVersion = 4.0.4;
 			};
 		};
+		9BDCEA992E6DA76A00176417 /* XCRemoteSwiftPackageReference "Toast-Swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scalessec/Toast-Swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.1.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -462,6 +474,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 9BDCEA8E2E6C0D9F00176417 /* XCRemoteSwiftPackageReference "RxGesture" */;
 			productName = RxGesture;
+		};
+		9BDCEA9A2E6DA76A00176417 /* Toast */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9BDCEA992E6DA76A00176417 /* XCRemoteSwiftPackageReference "Toast-Swift" */;
+			productName = Toast;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

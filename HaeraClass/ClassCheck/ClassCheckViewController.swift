@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 import RxSwift
 import RxCocoa
-
+import Toast
 
 final class ClassCheckViewController: BaseViewController {
 
@@ -161,6 +161,12 @@ extension ClassCheckViewController {
                 owner.navigationItem.backButtonTitle = ""
                 owner.navigationController?.navigationBar.tintColor = .black
                 owner.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
+
+        output.saveResult
+            .bind(with: self) { owner, value in
+                owner.view.makeToast(value, duration: 1.5, position: .bottom)
             }
             .disposed(by: disposeBag)
     }
