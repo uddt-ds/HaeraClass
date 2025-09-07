@@ -64,6 +64,16 @@ final class ClassCategoryCell: BaseCollectionViewCell, ReusableViewProtocol {
         }
     }
 
+    func setupTotalButton(isSelected: Bool) {
+        button.isSelected = isSelected
+
+        if button.isSelected {
+            button.layer.borderColor = ColorSet.lightOrange.color.cgColor
+        } else {
+            button.layer.borderColor = ColorSet.lightGray.color.cgColor
+        }
+    }
+
 }
 
 extension Reactive where Base: ClassCategoryCell {

@@ -134,10 +134,14 @@ extension ClassCheckViewController {
                 (row, element, cell) in
                 cell.configureCell(with: element.title, tag: element.rawValue)
 
+                if selectedCategory.value == 0 && element.rawValue == 0 {
+                    cell.setupTotalButton(isSelected: true)
+                } 
+
                 cell.rx.buttonTag
                     .bind(with: self) { owner, value in
-                        cell.changeButtonState()
                         selectedCategory.accept(value)
+                        cell.changeButtonState()
                     }
                     .disposed(by: cell.disposeBag)
             }

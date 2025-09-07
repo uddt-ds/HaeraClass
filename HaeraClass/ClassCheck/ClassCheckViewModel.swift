@@ -16,6 +16,8 @@ final class ClassCheckViewModel: ViewModelProtocol {
 
     private var disposeBag = DisposeBag()
 
+    var datas: [Data] = []
+
     struct Input {
         let initialSet: Observable<Void>
         let selectedCategory: BehaviorRelay<Int>
@@ -26,6 +28,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
 
     struct State {
         let totalData: BehaviorRelay<[Data]>
+        var currentCategories: Set<Int>
     }
 
     struct Output {
@@ -41,7 +44,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
 
         let buttonItems: BehaviorRelay<[CategoryTitle]> = .init(value: buttonTitles)
 
-        let state = State(totalData: .init(value: []))
+        var state = State(totalData: .init(value: []), currentCategories: [])
 
         let selectedData: BehaviorRelay<[Data]> = BehaviorRelay(value: [])
         let totalCount = PublishRelay<String>()
@@ -91,14 +94,45 @@ final class ClassCheckViewModel: ViewModelProtocol {
 
         input.selectedCategory
             .bind(with: self) { owner, value in
-                if value != 0 {
-                    let data = state.totalData.value.filter { $0.category == value }
-                    totalCount.accept("\(data.count)개")
-                    selectedData.accept(data)
+                if value == 0 {
+                    state.currentCategories.removeAll()
+                    state.totalData.accept(selectedData.value)
+                    totalCount.accept("\(selectedData.value.count)개")
                 } else {
-                    totalCount.accept("\(state.totalData.value.count)개")
-                    selectedData.accept(state.totalData.value)
+                    if !state.currentCategories.contains(value) {
+                        state.currentCategories.insert(value)
+                    } else {
+                        state.currentCategories.remove(value)
+                    }
+
+                    if state.currentCategories.isEmpty {
+                        selectedData.accept(state.totalData.value)
+                        totalCount.accept("\(state.totalData.value.count)개")
+                    } else {
+                        let data = state.totalData.value.filter { state.currentCategories.contains($0.category) }
+                        selectedData.accept(data)
+                        totalCount.accept("\(selectedData.value.count)개")
+                    }
                 }
+                totalCount.accept("\(selectedData.value.count)개")
+//                if value != 0 {
+//                    if !state.currentCategories.contains(value) {
+//                        state.currentCategories.insert(value)
+//                        let data = state.totalData.value.filter { $0.category == value }
+//                        owner.datas.append(contentsOf: data)
+//                        totalCount.accept("\(owner.datas.count)개")
+//                        selectedData.accept(owner.datas)
+//                    } else {
+//                        state.currentCategories.remove(value)
+//                        let data = owner.datas.filter { !($0.category == value) }
+//                        print(data)
+//                        totalCount.accept("\(data.count)개")
+//                        selectedData.accept(data)
+//                    }
+//                } else {
+//                    totalCount.accept("\(state.totalData.value.count)개")
+//                    selectedData.accept(state.totalData.value)
+//                }
             }
             .disposed(by: disposeBag)
 
