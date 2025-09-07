@@ -21,6 +21,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
         let selectedCategory: BehaviorRelay<Int>
         let currentButtonState: BehaviorRelay<Bool>
         let sortButtonTap: ControlEvent<Void>
+        let heartButtonTapped: BehaviorSubject<(String, Bool)>
     }
 
     struct State {
@@ -31,6 +32,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
         let selectedData: BehaviorRelay<[Data]>
         let totalCount: PublishRelay<String>
         let buttonItems: BehaviorRelay<[CategoryTitle]>
+        let saveResult: PublishRelay<String>
     }
 
     func transform(input: Input) -> Output {
@@ -43,6 +45,9 @@ final class ClassCheckViewModel: ViewModelProtocol {
 
         let selectedData: BehaviorRelay<[Data]> = BehaviorRelay(value: [])
         let totalCount = PublishRelay<String>()
+
+        let isLiked = PublishRelay<Bool>()
+        let saveResult = PublishRelay<String>()
 
         input.initialSet
             .withUnretained(self)
@@ -96,7 +101,31 @@ final class ClassCheckViewModel: ViewModelProtocol {
                 }
             }
             .disposed(by: disposeBag)
-        
-        return Output(selectedData: selectedData, totalCount: totalCount, buttonItems: buttonItems)
+
+        input.heartButtonTapped
+            .withUnretained(self)
+            .flatMap { owner, value in
+                let (classId, isLiked) = value
+                return owner.networkManager.fetchData(router: .likeClass(classId: classId, likeStatus: isLiked), type: Like.self)
+            }
+            .bind(with: self) { owner, responseData in
+                switch responseData {
+                case .success(let data):
+                    isLiked.accept(data.likeStatus)
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
+
+        isLiked
+            .map { $0 ? "클래스를 찜했습니다" : "클래스 찜을 취소했습니다" }
+            .bind(with: self) { owner, value in
+                saveResult.accept(value)
+            }
+            .disposed(by: disposeBag)
+
+
+        return Output(selectedData: selectedData, totalCount: totalCount, buttonItems: buttonItems, saveResult: saveResult)
     }
 }

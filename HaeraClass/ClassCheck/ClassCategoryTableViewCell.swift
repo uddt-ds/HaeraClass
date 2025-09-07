@@ -7,9 +7,13 @@
 
 import UIKit
 import SnapKit
+import RxSwift
+import RxCocoa
 import Kingfisher
 
 final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol {
+
+    let disposeBag = DisposeBag()
 
     private let classImageView: UIImageView = {
         let imageView = UIImageView()
@@ -19,7 +23,7 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
         return imageView
     }()
 
-    private let heartButton: UIButton = {
+    fileprivate let heartButton: UIButton = {
         let button = UIButton()
         button.setImage(.likeButton, for: .normal)
         button.setImage(.likeButtonFill, for: .selected)
@@ -183,10 +187,33 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
         price.text = data.bindSalePrice
         percentLabel.text = data.persent
 
+        heartButton.isSelected = data.isLiked
+        
         if data.bindSalePrice == "무료" {
             rawPrice.isHidden = true
         } else {
             rawPrice.isHidden = false
         }
     }
+
+    func updateHeartButton() {
+        heartButton.isSelected.toggle()
+        if heartButton.isSelected {
+            heartButton.setImage(.likeButtonFill, for: .normal)
+        } else {
+            heartButton.setImage(.likeButton, for: .normal)
+        }
+        print(heartButton.isSelected)
+    }
 }
+
+extension Reactive where Base: ClassCategoryTableViewCell {
+    var heartButtonTap: Observable<Bool> {
+        return base.heartButton.rx.tap
+            .map {
+                print("현재 상태: ", base.heartButton.isSelected)
+                return base.heartButton.isSelected
+            }
+    }
+}
+

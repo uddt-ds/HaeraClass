@@ -105,13 +105,23 @@ extension ClassCheckViewController {
 
         let selectedCategory = BehaviorRelay(value: 0)
 
-        let input = ClassCheckViewModel.Input(initialSet: Observable.just(()), selectedCategory: selectedCategory, currentButtonState: buttonState, sortButtonTap: sortButton.rx.tap)
+        let heartButtonTap = BehaviorSubject(value: ("", false))
+
+        let input = ClassCheckViewModel.Input(initialSet: Observable.just(()), selectedCategory: selectedCategory, currentButtonState: buttonState, sortButtonTap: sortButton.rx.tap, heartButtonTapped: heartButtonTap)
 
         let output = viewModel.transform(input: input)
 
         output.selectedData
             .bind(to: tableView.rx.items(cellIdentifier: ClassCategoryTableViewCell.identifier, cellType:ClassCategoryTableViewCell.self)) { (row, element, cell) in
                 cell.configureCell(with: element)
+                cell.rx.heartButtonTap
+                    .map { value in
+                        let changeButtonState = !value
+                        cell.updateHeartButton()
+                        return (element.classId, changeButtonState)
+                    }
+                    .bind(to: heartButtonTap)
+                    .disposed(by: cell.disposeBag)
             }
             .disposed(by: disposeBag)
 
@@ -123,6 +133,7 @@ extension ClassCheckViewController {
             .bind(to: collectionView.rx.items(cellIdentifier: ClassCategoryCell.identifier,cellType: ClassCategoryCell.self)) {
                 (row, element, cell) in
                 cell.configureCell(with: element.title, tag: element.rawValue)
+
                 cell.rx.buttonTag
                     .bind(with: self) { owner, value in
                         cell.changeButtonState()
