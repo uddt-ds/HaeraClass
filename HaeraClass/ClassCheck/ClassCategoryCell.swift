@@ -12,7 +12,7 @@ import RxCocoa
 
 final class ClassCategoryCell: BaseCollectionViewCell, ReusableViewProtocol {
 
-    let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
 
     fileprivate let button: UIButton = {
         let button = UIButton()
@@ -52,6 +52,7 @@ final class ClassCategoryCell: BaseCollectionViewCell, ReusableViewProtocol {
     func configureCell(with data: String, tag: Int) {
         button.setTitle(data, for: .normal)
         button.tag = tag
+        button.isSelected = isSelected
     }
 
     func changeButtonState() {
@@ -64,7 +65,7 @@ final class ClassCategoryCell: BaseCollectionViewCell, ReusableViewProtocol {
         }
     }
 
-    func setupTotalButton(isSelected: Bool) {
+    func setupButton(isSelected: Bool) {
         button.isSelected = isSelected
 
         if button.isSelected {
@@ -74,11 +75,22 @@ final class ClassCategoryCell: BaseCollectionViewCell, ReusableViewProtocol {
         }
     }
 
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        disposeBag = DisposeBag()
+    }
+
 }
 
 extension Reactive where Base: ClassCategoryCell {
     var buttonTag: Observable<Int> {
         return base.button.rx.tap
             .map { base.button.tag }
+    }
+
+    var isSelected: Binder<Bool> {
+        return .init(base) { cell, isSelected in
+            cell.setupButton(isSelected: isSelected)
+        }
     }
 }

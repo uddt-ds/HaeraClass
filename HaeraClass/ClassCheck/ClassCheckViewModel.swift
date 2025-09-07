@@ -36,6 +36,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
         let totalCount: PublishRelay<String>
         let buttonItems: BehaviorRelay<[CategoryTitle]>
         let saveResult: PublishRelay<String>
+        let selectedCategories: BehaviorRelay<Set<Int>>
     }
 
     func transform(input: Input) -> Output {
@@ -51,6 +52,8 @@ final class ClassCheckViewModel: ViewModelProtocol {
 
         let isLiked = PublishRelay<Bool>()
         let saveResult = PublishRelay<String>()
+
+        let selectedCategories: BehaviorRelay<Set<Int>> = BehaviorRelay(value: state.currentCategories)
 
         input.initialSet
             .withUnretained(self)
@@ -96,16 +99,20 @@ final class ClassCheckViewModel: ViewModelProtocol {
             .bind(with: self) { owner, value in
                 if value == 0 {
                     state.currentCategories.removeAll()
+                    selectedCategories.accept([0])
                     state.totalData.accept(selectedData.value)
                     totalCount.accept("\(selectedData.value.count)개")
                 } else {
                     if !state.currentCategories.contains(value) {
                         state.currentCategories.insert(value)
+                        selectedCategories.accept(state.currentCategories)
                     } else {
                         state.currentCategories.remove(value)
+                        selectedCategories.accept(state.currentCategories)
                     }
 
-                    if state.currentCategories.isEmpty {
+                    if state.currentCategories == [] {
+                        selectedCategories.accept([0])
                         selectedData.accept(state.totalData.value)
                         totalCount.accept("\(state.totalData.value.count)개")
                     } else {
@@ -115,24 +122,6 @@ final class ClassCheckViewModel: ViewModelProtocol {
                     }
                 }
                 totalCount.accept("\(selectedData.value.count)개")
-//                if value != 0 {
-//                    if !state.currentCategories.contains(value) {
-//                        state.currentCategories.insert(value)
-//                        let data = state.totalData.value.filter { $0.category == value }
-//                        owner.datas.append(contentsOf: data)
-//                        totalCount.accept("\(owner.datas.count)개")
-//                        selectedData.accept(owner.datas)
-//                    } else {
-//                        state.currentCategories.remove(value)
-//                        let data = owner.datas.filter { !($0.category == value) }
-//                        print(data)
-//                        totalCount.accept("\(data.count)개")
-//                        selectedData.accept(data)
-//                    }
-//                } else {
-//                    totalCount.accept("\(state.totalData.value.count)개")
-//                    selectedData.accept(state.totalData.value)
-//                }
             }
             .disposed(by: disposeBag)
 
@@ -160,6 +149,6 @@ final class ClassCheckViewModel: ViewModelProtocol {
             .disposed(by: disposeBag)
 
 
-        return Output(selectedData: selectedData, totalCount: totalCount, buttonItems: buttonItems, saveResult: saveResult)
+        return Output(selectedData: selectedData, totalCount: totalCount, buttonItems: buttonItems, saveResult: saveResult, selectedCategories: selectedCategories)
     }
 }

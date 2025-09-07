@@ -132,16 +132,17 @@ extension ClassCheckViewController {
         output.buttonItems
             .bind(to: collectionView.rx.items(cellIdentifier: ClassCategoryCell.identifier,cellType: ClassCategoryCell.self)) {
                 (row, element, cell) in
+
                 cell.configureCell(with: element.title, tag: element.rawValue)
 
-                if selectedCategory.value == 0 && element.rawValue == 0 {
-                    cell.setupTotalButton(isSelected: true)
-                } 
+                output.selectedCategories
+                    .map { $0.contains(element.rawValue) }
+                    .bind(to: cell.rx.isSelected)
+                    .disposed(by: cell.disposeBag)
 
                 cell.rx.buttonTag
                     .bind(with: self) { owner, value in
                         selectedCategory.accept(value)
-                        cell.changeButtonState()
                     }
                     .disposed(by: cell.disposeBag)
             }
@@ -167,6 +168,12 @@ extension ClassCheckViewController {
         output.saveResult
             .bind(with: self) { owner, value in
                 owner.view.makeToast(value, duration: 1.5, position: .bottom)
+            }
+            .disposed(by: disposeBag)
+
+        output.selectedCategories
+            .bind(with: self) { owner, value in
+                print(value)
             }
             .disposed(by: disposeBag)
     }
