@@ -22,12 +22,14 @@ final class ClassDetailViewModel: ViewModelProtocol {
     struct Input {
         let viewDidLoadTrigger: Observable<Void>
         let commentButtonTap: ControlEvent<Void>
+        let heartButtonTap: Observable<Bool>
     }
 
     struct Output {
         let detailData: PublishRelay<ClassDetail>
         let commentData: PublishRelay<Comment>
         let selectedClassId: PublishRelay<String>
+        let saveResult: PublishRelay<String>
     }
 
     func transform(input: Input) -> Output {
@@ -35,6 +37,10 @@ final class ClassDetailViewModel: ViewModelProtocol {
         let detailData = PublishRelay<ClassDetail>()
         let commentData = PublishRelay<Comment>()
         let selectedClassId = PublishRelay<String>()
+
+        let isLiked = PublishRelay<Bool>()
+
+        let saveResult = PublishRelay<String>()
 
         let viewDidLoad = input.viewDidLoadTrigger
             .share()
@@ -75,9 +81,27 @@ final class ClassDetailViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
+        input.heartButtonTap
+            .withUnretained(self)
+            .flatMap { owner, value in
+                return owner.networkManager.fetchData(router: .likeClass(classId: owner.classId, likeStatus: value), type: Like.self)
+            }
+            .bind(with: self) { owner, responseData in
+                switch responseData {
+                case .success(let data):
+                    isLiked.accept(data.likeStatus)
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
 
+        isLiked
+            .map { $0 ? "클래스를 찜했습니다" : "클래스 찜을 취소했습니다" }
+            .bind(to: saveResult)
+            .disposed(by: disposeBag)
 
-        return Output(detailData: detailData, commentData: commentData, selectedClassId: selectedClassId)
+        return Output(detailData: detailData, commentData: commentData, selectedClassId: selectedClassId, saveResult: saveResult)
     }
 
     init(classId: String, className: String, category: Int) {

@@ -55,7 +55,7 @@ final class ClassDetailViewController: BaseViewController {
         return button
     }()
 
-    private let heartButton: UIButton = {
+    let heartButton: UIButton = {
         let button = UIButton()
         button.setImage(.likeButton.withRenderingMode(.alwaysTemplate), for: .normal)
         button.tintColor = ColorSet.darkGray.color
@@ -70,7 +70,7 @@ final class ClassDetailViewController: BaseViewController {
         return stack
     }()
 
-    let headLabel: UILabel = {
+    private let headLabel: UILabel = {
         let label = UILabel()
         label.text = "클래스 소개"
         label.textColor = .darkGray
@@ -78,7 +78,7 @@ final class ClassDetailViewController: BaseViewController {
         return label
     }()
 
-    let introTextView: UITextView = {
+    private let introTextView: UITextView = {
         let textView = UITextView()
         textView.textColor = .darkGray
         textView.font = .systemFont(ofSize: 12)
@@ -98,6 +98,7 @@ final class ClassDetailViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
+        updateHeartButtonState()
         setupNavigation(viewModel.className)
     }
 
@@ -181,6 +182,8 @@ final class ClassDetailViewController: BaseViewController {
         nickLabel.text = data.creator.nick
         classInfoView.configureInfoView(data: data)
         introTextView.text = data.description
+        heartButton.isSelected = data.isLiked
+        updateHeartButtonState()
     }
 
     private func changeButtonState(_ isOn: Bool) {
@@ -195,6 +198,15 @@ final class ClassDetailViewController: BaseViewController {
 
     private func setupNavigation(_ title: String) {
         navigationItem.title = title
+    }
+
+    private func updateHeartButtonState() {
+        if heartButton.isSelected {
+            heartButton.setImage(.likeButtonFill, for: .normal)
+        } else {
+            heartButton.setImage(.likeButton.withRenderingMode(.alwaysTemplate), for: .normal)
+            heartButton.tintColor = ColorSet.darkGray.color
+        }
     }
 }
 
@@ -216,7 +228,15 @@ extension ClassDetailViewController {
 extension ClassDetailViewController {
     private func bind() {
 
-        let input = ClassDetailViewModel.Input(viewDidLoadTrigger: Observable.just(()), commentButtonTap: commentButton.rx.tap)
+        let heartButtonTap = heartButton.rx.tap
+            .withUnretained(self)
+            .map { owner, value in
+                owner.heartButton.isSelected.toggle()
+                owner.updateHeartButtonState()
+                return owner.heartButton.isSelected
+            }
+
+        let input = ClassDetailViewModel.Input(viewDidLoadTrigger: Observable.just(()), commentButtonTap: commentButton.rx.tap, heartButtonTap: heartButtonTap)
 
         let output = viewModel.transform(input: input)
 
@@ -239,6 +259,12 @@ extension ClassDetailViewController {
                 let vc = ClassCommentViewController(viewModel: viewModel)
                 owner.navigationItem.backButtonTitle = ""
                 owner.navigationController?.pushViewController(vc, animated: true)
+            }
+            .disposed(by: disposeBag)
+
+        output.saveResult
+            .bind(with: self) { owner, value in
+                print(value)
             }
             .disposed(by: disposeBag)
     }
