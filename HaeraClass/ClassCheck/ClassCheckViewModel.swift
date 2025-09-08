@@ -125,7 +125,10 @@ final class ClassCheckViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
-        Observable.combineLatest(input.selectedCategory, input.currentButtonState)
+        input.selectedCategory
+            .withLatestFrom(input.currentButtonState) { category, sortValue in
+                return (category, sortValue)
+            }
             .bind(with: self) { owner, value in
                 let (category, sortValue) = value
                 if category == 0 {
@@ -157,7 +160,6 @@ final class ClassCheckViewModel: ViewModelProtocol {
                 }
             }
             .disposed(by: disposeBag)
-
 
         input.heartButtonTapped
             .withUnretained(self)
