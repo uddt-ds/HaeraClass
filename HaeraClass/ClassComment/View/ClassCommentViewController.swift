@@ -38,6 +38,10 @@ final class ClassCommentViewController: BaseViewController {
         setupNavigation(viewModel.className)
     }
 
+    override func viewWillDisappear(_ animated: Bool) {
+        NotificationCenter.default.post(name: Notification.Name("commentPop"), object: nil)
+    }
+
     override func configureHierarchy() {
         super.configureHierarchy()
         [tableView].forEach { view.addSubview($0) }

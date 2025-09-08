@@ -276,5 +276,9 @@ extension ClassDetailViewController {
                 owner.view.makeToast(value, duration: 1.5, position: .bottom)
             }
             .disposed(by: disposeBag)
+
+        output.commentCount
+            .bind(to: commentButton.rx.title())
+            .disposed(by: disposeBag)
     }
 }

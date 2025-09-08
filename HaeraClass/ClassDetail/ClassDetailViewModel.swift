@@ -31,6 +31,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
         let commentData: PublishRelay<Comment>
         let selectedClassId: PublishRelay<String>
         let saveResult: PublishRelay<String>
+        let commentCount: PublishRelay<String>
     }
 
     func transform(input: Input) -> Output {
@@ -39,6 +40,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
         let photoData = PublishRelay<[String]>()
         let commentData = PublishRelay<Comment>()
         let selectedClassId = PublishRelay<String>()
+        let commentCount = PublishRelay<String>()
 
         let isLiked = PublishRelay<Bool>()
 
@@ -104,7 +106,22 @@ final class ClassDetailViewModel: ViewModelProtocol {
             .bind(to: saveResult)
             .disposed(by: disposeBag)
 
-        return Output(detailData: detailData, photoData: photoData, commentData: commentData, selectedClassId: selectedClassId, saveResult: saveResult)
+        NotificationCenter.default.rx.notification(Notification.Name("commentPop"), object: nil)
+            .withUnretained(self)
+            .flatMap { owner, value in
+                owner.networkManager.getData(router: .commentSearch(classId: owner.classId), type: Comment.self)
+            }
+            .bind(with: self) { owner, responseData in
+                switch responseData {
+                case .success(let value):
+                    commentCount.accept("댓글보기 (\(value.data.count))")
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
+
+        return Output(detailData: detailData, photoData: photoData, commentData: commentData, selectedClassId: selectedClassId, saveResult: saveResult, commentCount: commentCount)
     }
 
     init(classId: String, className: String, category: Int) {
