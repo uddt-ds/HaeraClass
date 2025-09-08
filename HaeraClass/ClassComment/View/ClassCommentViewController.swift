@@ -63,6 +63,10 @@ final class ClassCommentViewController: BaseViewController {
         navigationItem.title = title
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightBarButton)
     }
+
+    deinit {
+        print("deinit")
+    }
 }
 
 //MARK: Rx Binding
@@ -81,14 +85,14 @@ extension ClassCommentViewController {
 
                 cell.dotButtonHidden(!(output.currentUserId.value == element.creator.userID))
                 cell.rx.dotButtonTapped
-                    .bind(with: self) { owner, _ in
-                        // 여기서 메모리 누수 생김
+                    .bind(with: self) { [weak self] owner, _ in
+                        guard let self else { return }
                         AlertManager.shared.makeActionSheet {
                             let viewModel = CommentEditViewModel(navTitle: "댓글 수정", classTitleValue: owner.viewModel.className, classId: owner.viewModel.classId, category: owner.viewModel.category, commentID: element.commentId, content: element.content)
                             let vc = CommentEditViewController(viewModel: viewModel)
-                            owner.navigationController?.pushViewController(vc, animated: true)
+                            self.navigationController?.pushViewController(vc, animated: true)
                         } deleteHanlder: {
-                            owner.viewModel.commentId = element.commentId
+                            self.viewModel.commentId = element.commentId
                             deleteTapped.accept(())
                         }
                     }
