@@ -69,7 +69,6 @@ final class ClassCheckViewModel: ViewModelProtocol {
                 case .success(let response):
 
                     state.totalData.accept(response.data)
-                    print(response.data)
 
                     if state.currentCategories.isEmpty || state.currentCategories.contains(0) {
                         selectedData.accept(response.data)

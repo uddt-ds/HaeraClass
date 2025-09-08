@@ -105,7 +105,6 @@ extension ClassSearchViewController {
             .bind(to: tableView.rx.items(cellIdentifier: ClassSearchCell.identifier, cellType: ClassSearchCell.self)) { (row, element, cell) in
                 cell.configureCell(with: element)
                 cell.rx.heartButtonTap
-                    .debug()
                     .map{ value in
                         let changeButtonState = value
                         cell.updateHeartButton()

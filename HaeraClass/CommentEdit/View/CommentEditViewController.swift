@@ -140,7 +140,6 @@ final class CommentEditViewController: BaseViewController {
         }
     }
 
-    //TODO: ViewModel로 보내서 처리할지 고민
     private func setInitialText() {
         if let text = viewModel.content {
             textView.text = text

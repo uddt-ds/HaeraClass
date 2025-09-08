@@ -78,13 +78,13 @@ extension ClassCommentViewController {
         output.commentData
             .bind(to: tableView.rx.items(cellIdentifier: CommentCell.identifier, cellType: CommentCell.self)) { (row, element, cell) in
                 cell.configureCell(element)
-                print(element)
+
                 cell.dotButtonHidden(!(output.currentUserId.value == element.creator.userID))
                 cell.rx.dotButtonTapped
                     .bind(with: self) { owner, _ in
+                        // 여기서 메모리 누수 생김
                         AlertManager.shared.makeActionSheet {
                             let viewModel = CommentEditViewModel(navTitle: "댓글 수정", classTitleValue: owner.viewModel.className, classId: owner.viewModel.classId, category: owner.viewModel.category, commentID: element.commentId, content: element.content)
-                            print(element.commentId)
                             let vc = CommentEditViewController(viewModel: viewModel)
                             owner.navigationController?.pushViewController(vc, animated: true)
                         } deleteHanlder: {

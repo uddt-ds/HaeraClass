@@ -61,7 +61,6 @@ final class ClassCheckViewController: BaseViewController {
         super.viewWillAppear(animated)
         tabBarController?.tabBar.isHidden = false
 
-        print(#function)
         viewWillAppearTrigger.onNext(())
     }
 
@@ -98,8 +97,6 @@ final class ClassCheckViewController: BaseViewController {
     override func configureView() {
         super.configureView()
     }
-
-
 }
 
 // MARK: Rx Binding
@@ -173,12 +170,6 @@ extension ClassCheckViewController {
         output.saveResult
             .bind(with: self) { owner, value in
                 owner.view.makeToast(value, duration: 1.5, position: .bottom)
-            }
-            .disposed(by: disposeBag)
-
-        output.selectedCategories
-            .bind(with: self) { owner, value in
-                print(value)
             }
             .disposed(by: disposeBag)
 

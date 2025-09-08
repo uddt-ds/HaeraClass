@@ -215,7 +215,6 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
         } else {
             heartButton.setImage(.likeButton, for: .normal)
         }
-        print(heartButton.isSelected)
     }
 
     override func prepareForReuse() {

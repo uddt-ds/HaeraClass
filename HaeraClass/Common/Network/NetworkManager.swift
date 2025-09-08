@@ -92,12 +92,3 @@ final class NetworkManager {
         }
     }
 }
-
-extension NetworkManager {
-    enum NetworkError: Int, Error {
-        case invalidKey = 420
-        case tooManyCalls = 429
-        case invalidURL = 444
-        case serverError = 500
-    }
-}

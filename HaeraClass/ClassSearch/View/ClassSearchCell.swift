@@ -148,7 +148,6 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
             heartButton.setImage(.likeButton.withRenderingMode(.alwaysTemplate), for: .normal)
             heartButton.tintColor = .gray
         }
-        print(heartButton.isSelected)
     }
 
 

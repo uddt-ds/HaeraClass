@@ -103,7 +103,6 @@ final class CommentEditViewModel: ViewModelProtocol{
             .map { !($0 < 2 || $0 > 200) }
             .bind(with: self) { owner, value in
                 saveButtonState.accept(value)
-                print(value)
             }
             .disposed(by: disposeBag)
 
