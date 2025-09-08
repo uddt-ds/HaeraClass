@@ -80,4 +80,10 @@ struct Creator: Decodable {
     }
 }
 
+extension Creator {
+    var bindImageUrl: URL? {
+        return URL(string: BaseURL.url + "/v1" + (profileImage ?? ""))
+    }
+}
+
 

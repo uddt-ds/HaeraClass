@@ -139,20 +139,8 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
 
 
     func configureCell(with data: Data) {
-        guard let headerKey = Bundle.main.object(forInfoDictionaryKey: "SesacKey") as? String else { return }
 
-        let modifier = AnyModifier { request in
-            var header = request
-            header.setValue(UserDefaults.standard.string(forKey: "token") ?? "", forHTTPHeaderField: "Authorization")
-            header.setValue(headerKey, forHTTPHeaderField: "SesacKey")
-            return header
-        }
-
-        classImageView.kf.setImage(with: data.bindImageUrl,
-                                   options: [
-                                    .requestModifier(modifier)
-                                   ]
-        )
+        classImageView.kf.setImageWithHeaders(with: data.bindImageUrl)
         headTitleLabel.text = data.title
         categoryTag.setTitle(data.categoryTitle, for: .normal)
         rawPrice.text = data.bindPrice

@@ -144,7 +144,7 @@ final class CommentCell: BaseTableViewCell, ReusableViewProtocol {
     }
 
     func configureCell(_ data: CommentData) {
-        //        profileImageView.image = ""
+        profileImageView.kf.setImageWithHeaders(with: data.creator.bindImageUrl)
         nickLabel.text = data.creator.nick
         let relativeTime = DateManager.getRelativeDate(value: data.createdAt)
         timeLabel.text = relativeTime

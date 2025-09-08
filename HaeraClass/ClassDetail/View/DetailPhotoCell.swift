@@ -7,13 +7,14 @@
 
 import UIKit
 import SnapKit
+import Kingfisher
 
 final class DetailPhotoCell: BaseCollectionViewCell, ReusableViewProtocol {
 
     let photoImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.image = .noProfile
+        imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
         return imageView
     }()
 
@@ -35,5 +36,10 @@ final class DetailPhotoCell: BaseCollectionViewCell, ReusableViewProtocol {
 
     override func configureView() {
         super.configureView()
+    }
+
+    func configureCell(with data: String) {
+        guard let url = URL(string: BaseURL.url + "/v1" + data) else { return }
+        photoImageView.kf.setImageWithHeaders(with: url)
     }
 }

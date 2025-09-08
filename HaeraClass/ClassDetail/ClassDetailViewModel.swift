@@ -27,6 +27,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
 
     struct Output {
         let detailData: PublishRelay<ClassDetail>
+        let photoData: PublishRelay<[String]>
         let commentData: PublishRelay<Comment>
         let selectedClassId: PublishRelay<String>
         let saveResult: PublishRelay<String>
@@ -35,6 +36,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
     func transform(input: Input) -> Output {
 
         let detailData = PublishRelay<ClassDetail>()
+        let photoData = PublishRelay<[String]>()
         let commentData = PublishRelay<Comment>()
         let selectedClassId = PublishRelay<String>()
 
@@ -54,6 +56,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
                 switch responseData {
                 case .success(let data):
                     detailData.accept(data)
+                    photoData.accept(data.imageUrls)
                 case .failure(let error):
                     print(error)
                 }
@@ -101,7 +104,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
             .bind(to: saveResult)
             .disposed(by: disposeBag)
 
-        return Output(detailData: detailData, commentData: commentData, selectedClassId: selectedClassId, saveResult: saveResult)
+        return Output(detailData: detailData, photoData: photoData, commentData: commentData, selectedClassId: selectedClassId, saveResult: saveResult)
     }
 
     init(classId: String, className: String, category: Int) {

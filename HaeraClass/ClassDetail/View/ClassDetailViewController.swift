@@ -20,6 +20,8 @@ final class ClassDetailViewController: BaseViewController {
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.makeCollectionViewLayout())
         collectionView.register(DetailPhotoCell.self, forCellWithReuseIdentifier: DetailPhotoCell.identifier)
+        collectionView.isPagingEnabled = true
+        collectionView.showsHorizontalScrollIndicator = false
         return collectionView
     }()
 
@@ -180,6 +182,7 @@ final class ClassDetailViewController: BaseViewController {
     }
 
     private func configureDetailView(data: ClassDetail) {
+        profileImageView.kf.setImageWithHeaders(with: data.creator.bindImageUrl)
         nickLabel.text = data.creator.nick
         classInfoView.configureInfoView(data: data)
         introTextView.text = data.description
@@ -244,6 +247,12 @@ extension ClassDetailViewController {
         output.detailData
             .bind(with: self) { owner, value in
                 owner.configureDetailView(data: value)
+            }
+            .disposed(by: disposeBag)
+
+        output.photoData
+            .bind(to: collectionView.rx.items(cellIdentifier: DetailPhotoCell.identifier, cellType: DetailPhotoCell.self)) { (row, element, cell) in
+                cell.configureCell(with: element)
             }
             .disposed(by: disposeBag)
 
