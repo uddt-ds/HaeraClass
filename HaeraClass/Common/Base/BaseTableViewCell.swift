@@ -32,6 +32,7 @@ class BaseTableViewCell: UITableViewCell {
     func configureView() {
         contentView.backgroundColor = .clear
         backgroundColor = .clear
+        selectionStyle = .none
     }
 
 }

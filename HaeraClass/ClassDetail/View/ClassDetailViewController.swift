@@ -172,7 +172,7 @@ final class ClassDetailViewController: BaseViewController {
 
         commentButton.snp.makeConstraints { make in
             make.height.equalTo(52)
-            make.width.equalTo(270)
+            make.width.equalTo(260)
         }
     }
 
