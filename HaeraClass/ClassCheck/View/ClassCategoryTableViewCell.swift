@@ -50,16 +50,11 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
         return button
     }()
 
-    private let blankView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .clear
-        return view
-    }()
-
     private lazy var headStackView: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [headTitleLabel, categoryTag, blankView])
+        let stack = UIStackView(arrangedSubviews: [headTitleLabel, categoryTag])
         stack.axis = .horizontal
         stack.spacing = 8
+        stack.alignment = .center
         stack.distribution = .fill
         return stack
     }()
@@ -127,6 +122,8 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
     }
 
     override func configureLayout() {
+        configureStackSubViewLayout()
+
         classImageView.snp.makeConstraints { make in
             make.top.equalToSuperview().offset(12)
             make.directionalHorizontalEdges.equalToSuperview().inset(20)
@@ -142,7 +139,8 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
         headStackView.snp.makeConstraints { make in
             make.top.equalTo(classImageView.snp.bottom).offset(12)
             make.height.equalTo(20)
-            make.directionalHorizontalEdges.equalTo(classImageView)
+            make.leading.equalTo(contentView.safeAreaLayoutGuide).offset(20)
+            make.trailing.lessThanOrEqualToSuperview().inset(20)
         }
 
         contentTitle.snp.makeConstraints { make in
@@ -166,9 +164,10 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
     private func configureStackSubViewLayout() {
         categoryTag.snp.makeConstraints { make in
             make.height.equalTo(16)
+            make.width.equalTo(30)
         }
 
-        blankView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        headTitleLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
 
         priceBlankView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
     }

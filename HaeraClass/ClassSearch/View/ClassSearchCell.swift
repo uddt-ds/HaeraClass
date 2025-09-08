@@ -75,7 +75,8 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
 
     fileprivate let heartButton: UIButton = {
         let button = UIButton()
-        button.setImage(.likeButton, for: .normal)
+        button.setImage(.likeButton.withRenderingMode(.alwaysTemplate), for: .normal)
+        button.tintColor = .gray
         button.setImage(.likeButtonFill, for: .selected)
         return button
     }()
@@ -105,6 +106,7 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
         headTitleLabel.snp.makeConstraints { make in
             make.top.equalTo(categoryTag.snp.bottom).offset(4)
             make.leading.equalTo(categoryTag)
+            make.trailing.equalToSuperview().inset(40)
         }
 
         rawPrice.snp.makeConstraints { make in
@@ -143,7 +145,8 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
         if heartButton.isSelected {
             heartButton.setImage(.likeButtonFill, for: .normal)
         } else {
-            heartButton.setImage(.likeButton, for: .normal)
+            heartButton.setImage(.likeButton.withRenderingMode(.alwaysTemplate), for: .normal)
+            heartButton.tintColor = .gray
         }
         print(heartButton.isSelected)
     }
@@ -180,7 +183,6 @@ extension Reactive where Base: ClassSearchCell {
         return base.heartButton.rx.tap
             .map {
                 base.heartButton.isSelected.toggle()
-                print("현재 상태: ", base.heartButton.isSelected)
                 return base.heartButton.isSelected
             }
     }
