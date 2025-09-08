@@ -1,5 +1,5 @@
 //
-//  NetworkError.swift
+//  CustomNetworkError.swift
 //  HaeraClass
 //
 //  Created by Lee on 9/8/25.
