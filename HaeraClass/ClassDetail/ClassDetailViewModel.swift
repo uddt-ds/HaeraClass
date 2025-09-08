@@ -32,6 +32,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
         let selectedClassId: PublishRelay<String>
         let saveResult: PublishRelay<String>
         let commentCount: PublishRelay<String>
+        let errorMessage: PublishRelay<String>
     }
 
     func transform(input: Input) -> Output {
@@ -45,6 +46,8 @@ final class ClassDetailViewModel: ViewModelProtocol {
         let isLiked = PublishRelay<Bool>()
 
         let saveResult = PublishRelay<String>()
+
+        let errorMessage = PublishRelay<String>()
 
         let viewDidLoad = input.viewDidLoadTrigger
             .share()
@@ -60,7 +63,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
                     detailData.accept(data)
                     photoData.accept(data.imageUrls)
                 case .failure(let error):
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
@@ -75,7 +78,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
                 case .success(let data):
                     commentData.accept(data)
                 case .failure(let error):
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
@@ -96,7 +99,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
                 case .success(let data):
                     isLiked.accept(data.likeStatus)
                 case .failure(let error):
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
@@ -116,12 +119,12 @@ final class ClassDetailViewModel: ViewModelProtocol {
                 case .success(let value):
                     commentCount.accept("댓글보기 (\(value.data.count))")
                 case .failure(let error):
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
 
-        return Output(detailData: detailData, photoData: photoData, commentData: commentData, selectedClassId: selectedClassId, saveResult: saveResult, commentCount: commentCount)
+        return Output(detailData: detailData, photoData: photoData, commentData: commentData, selectedClassId: selectedClassId, saveResult: saveResult, commentCount: commentCount, errorMessage: errorMessage)
     }
 
     init(classId: String, className: String, category: Int) {

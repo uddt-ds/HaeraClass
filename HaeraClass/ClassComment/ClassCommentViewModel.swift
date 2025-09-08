@@ -37,6 +37,7 @@ final class ClassCommentViewModel: ViewModelProtocol {
     struct Output {
         let commentData: BehaviorRelay<[CommentData]>
         let currentUserId: BehaviorRelay<String>
+        let errorMessage: PublishRelay<String>
     }
 
     func transform(input: Input) -> Output {
@@ -44,6 +45,8 @@ final class ClassCommentViewModel: ViewModelProtocol {
         let commentData: BehaviorRelay<[CommentData]> = BehaviorRelay(value: [])
 
         let currentUserId = BehaviorRelay(value: userId)
+
+        let errorMessage = PublishRelay<String>()
 
         let viewDidLoad = input.viewDidLoadTrigger
             .share()
@@ -58,7 +61,7 @@ final class ClassCommentViewModel: ViewModelProtocol {
                 case .success(let value):
                     commentData.accept(value.data)
                 case .failure(let error):
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
@@ -77,7 +80,7 @@ final class ClassCommentViewModel: ViewModelProtocol {
                 case .success(let value):
                     commentData.accept(value.data)
                 case .failure(let error):
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
@@ -92,11 +95,11 @@ final class ClassCommentViewModel: ViewModelProtocol {
                 case .success(let value):
                     commentData.accept(value.data)
                 case .failure(let error):
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
 
-        return Output(commentData: commentData, currentUserId: currentUserId)
+        return Output(commentData: commentData, currentUserId: currentUserId, errorMessage: errorMessage)
     }
 }

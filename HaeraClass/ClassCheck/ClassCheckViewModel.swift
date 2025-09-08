@@ -38,6 +38,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
         let buttonItems: BehaviorRelay<[CategoryTitle]>
         let saveResult: PublishRelay<String>
         let selectedCategories: BehaviorRelay<Set<Int>>
+        let errorMessage: PublishRelay<String>
     }
 
     func transform(input: Input) -> Output {
@@ -53,6 +54,8 @@ final class ClassCheckViewModel: ViewModelProtocol {
 
         let isLiked = PublishRelay<Bool>()
         let saveResult = PublishRelay<String>()
+
+        let errorMessage = PublishRelay<String>()
 
         let selectedCategories: BehaviorRelay<Set<Int>> = BehaviorRelay(value: state.currentCategories)
 
@@ -78,7 +81,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
                     let countTitle = "\(selectedData.value.count)개"
                     totalCount.accept(countTitle)
                 case .failure(let error):
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
@@ -96,7 +99,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
                     let totalTitle = "\(response.data.count)개"
                     totalCount.accept(totalTitle)
                 case .failure(let error):
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
@@ -164,7 +167,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
                 case .success(let data):
                     isLiked.accept(data.likeStatus)
                 case .failure(let error):
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
@@ -177,6 +180,6 @@ final class ClassCheckViewModel: ViewModelProtocol {
             .disposed(by: disposeBag)
 
 
-        return Output(selectedData: selectedData, totalCount: totalCount, buttonItems: buttonItems, saveResult: saveResult, selectedCategories: selectedCategories)
+        return Output(selectedData: selectedData, totalCount: totalCount, buttonItems: buttonItems, saveResult: saveResult, selectedCategories: selectedCategories, errorMessage: errorMessage)
     }
 }

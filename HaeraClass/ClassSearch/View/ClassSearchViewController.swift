@@ -95,8 +95,6 @@ final class ClassSearchViewController: BaseViewController {
 extension ClassSearchViewController {
 
     private func bind() {
-        // 버튼이 눌렸을 때 현재 상태가 가져와짐
-
         let heartButtonTap = PublishSubject<(String, Bool)>()
 
         let input = ClassSearchViewModel.Input(viewWillAppearTrigger: viewWillAppearTrigger,searchText: searchBar.rx.text.orEmpty, searchButtonTapped: searchBar.rx.searchButtonClicked, heartButtonTapped: heartButtonTap)
@@ -140,6 +138,12 @@ extension ClassSearchViewController {
         output.saveResult
             .bind(with: self) { owner, value in
                 owner.view.makeToast(value, duration: 1.5, position: .bottom)
+            }
+            .disposed(by: disposeBag)
+
+        output.errorMessage
+            .bind(with: self) { owner, value in
+                AlertManager.shared.showBasicAlert(value)
             }
             .disposed(by: disposeBag)
     }

@@ -196,6 +196,12 @@ extension CommentEditViewController: UIScrollViewDelegate {
                 owner.navigationController?.popViewController(animated: true)
             }
             .disposed(by: disposeBag)
+
+        output.errorMessage
+            .bind(with: self) { owner, value in
+                AlertManager.shared.showBasicAlert(value)
+            }
+            .disposed(by: disposeBag)
     }
 }
 

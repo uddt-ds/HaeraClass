@@ -103,5 +103,11 @@ extension ClassCommentViewController {
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
             .disposed(by: disposeBag)
+
+        output.errorMessage
+            .bind(with: self) { owner, value in
+                AlertManager.shared.showBasicAlert(value)
+            }
+            .disposed(by: disposeBag)
     }
 }

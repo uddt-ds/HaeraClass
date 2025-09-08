@@ -41,6 +41,7 @@ final class CommentEditViewModel: ViewModelProtocol{
         let textColor: BehaviorRelay<String>
         let saveButtonState: BehaviorRelay<Bool>
         let isSaved: BehaviorRelay<Bool>
+        let errorMessage: PublishRelay<String>
     }
 
     func transform(input: Input) -> Output {
@@ -52,6 +53,8 @@ final class CommentEditViewModel: ViewModelProtocol{
         let saveButtonState = BehaviorRelay(value: false)
 
         let isSaved = BehaviorRelay(value: false)
+
+        let errorMessage = PublishRelay<String>()
 
         let textField = input.textField
             .distinctUntilChanged()
@@ -120,12 +123,12 @@ final class CommentEditViewModel: ViewModelProtocol{
                     isSaved.accept(true)
                 case .failure(let error):
                     isSaved.accept(false)
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
 
-        return Output(textCount: textCount, textColor: textColor, saveButtonState: saveButtonState, isSaved: isSaved)
+        return Output(textCount: textCount, textColor: textColor, saveButtonState: saveButtonState, isSaved: isSaved, errorMessage: errorMessage)
     }
 
     private func getOnlyTextCount(_ text: String) -> Int {

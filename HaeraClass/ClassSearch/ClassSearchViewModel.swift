@@ -27,6 +27,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
         let searchResult: PublishRelay<[Data]>
         let searchResultLabel: BehaviorRelay<String>
         let saveResult: PublishRelay<String>
+        let errorMessage: PublishRelay<String>
     }
 
     func transform(input: Input) -> Output {
@@ -35,6 +36,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
         let searchResultLabel = BehaviorRelay(value: "원하는 클래스가 있으신가요?")
         let isLiked = PublishRelay<Bool>()
         let saveResult = PublishRelay<String>()
+        let errorMessage = PublishRelay<String>()
 
         input.viewWillAppearTrigger
             .withLatestFrom(input.searchText)
@@ -56,7 +58,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
                     }
 
                 case .failure(let error):
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
@@ -83,7 +85,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
                     }
 
                 case .failure(let error):
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
@@ -98,9 +100,8 @@ final class ClassSearchViewModel: ViewModelProtocol {
                 switch responseData {
                 case .success(let data):
                     isLiked.accept(data.likeStatus)
-                    print(data.likeStatus)
                 case .failure(let error):
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
@@ -112,6 +113,6 @@ final class ClassSearchViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
-        return Output(searchResult: searchResult, searchResultLabel: searchResultLabel, saveResult: saveResult)
+        return Output(searchResult: searchResult, searchResultLabel: searchResultLabel, saveResult: saveResult, errorMessage: errorMessage)
     }
 }
