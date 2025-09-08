@@ -19,6 +19,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
     var datas: [Data] = []
 
     struct Input {
+        let viewWillAppearTrigger: PublishSubject<Void>
         let initialSet: Observable<Void>
         let selectedCategory: BehaviorRelay<Int>
         let currentButtonState: BehaviorRelay<Bool>
@@ -54,6 +55,33 @@ final class ClassCheckViewModel: ViewModelProtocol {
         let saveResult = PublishRelay<String>()
 
         let selectedCategories: BehaviorRelay<Set<Int>> = BehaviorRelay(value: state.currentCategories)
+
+        input.viewWillAppearTrigger
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.networkManager.getData(router: .classCheck, type: ClassCheck.self)
+            }
+            .bind(with: self) { owner, value in
+                switch value {
+                case .success(let response):
+
+                    state.totalData.accept(response.data)
+                    print(response.data)
+
+                    if state.currentCategories.isEmpty || state.currentCategories.contains(0) {
+                        selectedData.accept(response.data)
+                    } else {
+                        let filterData = response.data.filter { state.currentCategories.contains($0.category) }
+                        selectedData.accept(filterData)
+                    }
+
+                    let countTitle = "\(selectedData.value.count)개"
+                    totalCount.accept(countTitle)
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
 
         input.initialSet
             .withUnretained(self)

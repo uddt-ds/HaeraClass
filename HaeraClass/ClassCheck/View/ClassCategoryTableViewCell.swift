@@ -197,7 +197,6 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
     }
 
     func updateHeartButton() {
-        heartButton.isSelected.toggle()
         if heartButton.isSelected {
             heartButton.setImage(.likeButtonFill, for: .normal)
         } else {
@@ -216,7 +215,7 @@ extension Reactive where Base: ClassCategoryTableViewCell {
     var heartButtonTap: Observable<Bool> {
         return base.heartButton.rx.tap
             .map {
-                print("현재 상태: ", base.heartButton.isSelected)
+                base.heartButton.isSelected.toggle()
                 return base.heartButton.isSelected
             }
     }

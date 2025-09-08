@@ -12,7 +12,7 @@ import Kingfisher
 
 final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
 
-    let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
 
     private let classImageView: UIImageView = {
         let imageView = UIImageView()
@@ -128,7 +128,6 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
     }
 
     func updateHeartButton() {
-        heartButton.isSelected.toggle()
         if heartButton.isSelected {
             heartButton.setImage(.likeButtonFill, for: .normal)
         } else {
@@ -158,7 +157,7 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
 
     override func prepareForReuse() {
         super.prepareForReuse()
-        heartButton.isSelected = false
+        disposeBag = DisposeBag()
     }
 }
 
@@ -166,6 +165,7 @@ extension Reactive where Base: ClassSearchCell {
     var heartButtonTap: Observable<Bool> {
         return base.heartButton.rx.tap
             .map {
+                base.heartButton.isSelected.toggle()
                 print("현재 상태: ", base.heartButton.isSelected)
                 return base.heartButton.isSelected
             }

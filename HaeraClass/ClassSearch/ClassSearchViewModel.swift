@@ -16,6 +16,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
     let disposeBag = DisposeBag()
 
     struct Input {
+        let viewWillAppearTrigger: PublishSubject<Void>
         let searchText: ControlProperty<String>
         let searchButtonTapped:  ControlEvent<Void>
         let heartButtonTapped: BehaviorSubject<(String, Bool)>
@@ -34,6 +35,32 @@ final class ClassSearchViewModel: ViewModelProtocol {
         let searchResultLabel = BehaviorRelay(value: "원하는 클래스가 있으신가요?")
         let isLiked = PublishRelay<Bool>()
         let saveResult = PublishRelay<String>()
+
+        input.viewWillAppearTrigger
+            .withLatestFrom(input.searchText)
+            .withUnretained(self)
+            .flatMap { owner, value in
+                print(value)
+                return owner.networkManager.getData(router: .classSearch(title: value), type: ClassCheck.self)
+            }
+            .bind(with: self) { owner, responseData in
+                switch responseData {
+                case .success(let responseData):
+                    print(responseData)
+                    searchResult.accept(responseData.data)
+
+                    if responseData.data.count == 0 {
+                        searchResultLabel.accept("검색 결과가 없습니다")
+                    } else {
+                        searchResultLabel.accept("")
+                    }
+
+                case .failure(let error):
+                    print(error)
+                }
+            }
+            .disposed(by: disposeBag)
+
 
         input.searchButtonTapped
             .withLatestFrom(input.searchText)

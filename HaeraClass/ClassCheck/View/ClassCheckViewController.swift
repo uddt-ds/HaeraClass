@@ -17,6 +17,8 @@ final class ClassCheckViewController: BaseViewController {
 
     let viewModel = ClassCheckViewModel()
 
+    let viewWillAppearTrigger = PublishSubject<Void>()
+
     private lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: self.makeCollectionViewFlowLayout())
         collectionView.showsHorizontalScrollIndicator = false
@@ -58,6 +60,9 @@ final class ClassCheckViewController: BaseViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         tabBarController?.tabBar.isHidden = false
+
+        print(#function)
+        viewWillAppearTrigger.onNext(())
     }
 
     override func configureHierarchy() {
@@ -107,7 +112,7 @@ extension ClassCheckViewController {
 
         let heartButtonTap = BehaviorSubject(value: ("", false))
 
-        let input = ClassCheckViewModel.Input(initialSet: Observable.just(()), selectedCategory: selectedCategory, currentButtonState: buttonState, sortButtonTap: sortButton.rx.tap, heartButtonTapped: heartButtonTap)
+        let input = ClassCheckViewModel.Input(viewWillAppearTrigger: viewWillAppearTrigger, initialSet: Observable.just(()), selectedCategory: selectedCategory, currentButtonState: buttonState, sortButtonTap: sortButton.rx.tap, heartButtonTapped: heartButtonTap)
 
         let output = viewModel.transform(input: input)
 

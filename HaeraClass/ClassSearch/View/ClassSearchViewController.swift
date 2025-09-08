@@ -17,6 +17,8 @@ final class ClassSearchViewController: BaseViewController {
 
     let viewModel = ClassSearchViewModel()
 
+    let viewWillAppearTrigger = PublishSubject<Void>()
+
     private let searchBar: UISearchBar = {
         let searchBar = UISearchBar()
         searchBar.placeholder = TextField.search.rawValue
@@ -54,6 +56,7 @@ final class ClassSearchViewController: BaseViewController {
         super.viewWillAppear(animated)
 
         tabBarController?.tabBar.isHidden = false
+        viewWillAppearTrigger.onNext(())
     }
 
     override func configureHierarchy() {
@@ -90,13 +93,13 @@ final class ClassSearchViewController: BaseViewController {
 
 // MARK: Rx Binding
 extension ClassSearchViewController {
-    private func bind() {
 
+    private func bind() {
         // 버튼이 눌렸을 때 현재 상태가 가져와짐
 
         let heartButtonTap = BehaviorSubject(value: ("", false))
 
-        let input = ClassSearchViewModel.Input(searchText: searchBar.rx.text.orEmpty, searchButtonTapped: searchBar.rx.searchButtonClicked, heartButtonTapped: heartButtonTap)
+        let input = ClassSearchViewModel.Input(viewWillAppearTrigger: viewWillAppearTrigger,searchText: searchBar.rx.text.orEmpty, searchButtonTapped: searchBar.rx.searchButtonClicked, heartButtonTapped: heartButtonTap)
 
         let output = viewModel.transform(input: input)
 
@@ -104,8 +107,9 @@ extension ClassSearchViewController {
             .bind(to: tableView.rx.items(cellIdentifier: ClassSearchCell.identifier, cellType: ClassSearchCell.self)) { (row, element, cell) in
                 cell.configureCell(with: element)
                 cell.rx.heartButtonTap
+                    .debug()
                     .map{ value in
-                        let changeButtonState = !value
+                        let changeButtonState = value
                         cell.updateHeartButton()
                         return (element.classId, changeButtonState)
                     }
