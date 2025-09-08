@@ -17,9 +17,9 @@ enum Router {
     case commentSearch(classId: String)
     case commentRevise(classId: String, commentId: String, content: String)
     case commentDelete(classId: String, commentId: String)
-    case likeClass(classId: String)
+    case likeClass(classId: String, likeStatus: Bool)
     case profileCheck
-    case profileRevise(nick: String?, profile: Data?)
+
 
     var baseURL: String {
         return BaseURL.url
@@ -35,12 +35,8 @@ enum Router {
         case .commentSearch(let classId): return "/v1/courses/\(classId)/comments"
         case .commentRevise(let classId, let commentId, _): return "/v1/courses/\(classId)/comments/\(commentId)"
         case .commentDelete(let classId, let commentId): return "/v1/courses/\(classId)/comments/\(commentId)"
-        case .likeClass(let classId):
-            return "/v1/courses/\(classId)/like"
-        case .profileCheck:
-            return "/v1/users/me/profile"
-        case .profileRevise:
-            return "/v1/users/me/profile"
+        case .likeClass(let classId, _):  return "/v1/courses/\(classId)/like"
+        case .profileCheck: return "/v1/users/me/profile"
         }
     }
 
@@ -56,7 +52,6 @@ enum Router {
         case .commentDelete: return .delete
         case .likeClass: return .post
         case .profileCheck: return .get
-        case .profileRevise: return .put
         }
     }
 
@@ -67,14 +62,16 @@ enum Router {
     var header: HTTPHeaders {
         guard let headerKey = Bundle.main.object(forInfoDictionaryKey: "SesacKey") as? String else { return .init() }
 
-        // TODO: token 정보 UserDefaults에 저장하고 해당 값 사용하기
-        guard let token = Bundle.main.object(forInfoDictionaryKey: "AccessToken") as? String else { return .init() }
+        let token = UserDefaults.standard.string(forKey: "token")
 
-        let defaultHeader: HTTPHeaders = [
+        var defaultHeader: HTTPHeaders = [
             "SesacKey": headerKey,
-            "Authorization": token,
             "Content-Type": "application/json"
         ]
+
+        if let token {
+            defaultHeader.add(name: "Authorization", value: token)
+        }
 
         switch self {
         case .login:
@@ -82,12 +79,7 @@ enum Router {
                 "SesacKey": headerKey,
                 "Content-Type": "application/json"
             ]
-        case .profileRevise:
-            return [
-                "SesacKey": headerKey,
-                "Authorization": token,
-                "Content-Type": "multipart/form-data"
-            ]
+
         default:
             return defaultHeader
         }
@@ -113,18 +105,66 @@ enum Router {
             return [
                 "content": reviseString
             ]
-        case .profileRevise(let nick, let profile):
-            if let nick = nick, let profile = profile {
-                return [
-                    "nick": nick,
-                    "profile": profile
-                ]
-            }
-            return .init()
 
+        case .likeClass(_, let likeStatus):
+            return [
+                "like_status": likeStatus
+            ]
         default:
             return .init()
         }
     }
 }
 
+//enum MultipartRouter {
+//    case profileRevise(nick: String?, profile: Data?)
+//
+//    var baseURL: String {
+//        return BaseURL.url
+//    }
+//
+//    var path: String {
+//        switch self {
+//        case .profileRevise:
+//            return "/v1/users/me/profile"
+//        }
+//    }
+//
+//    var method: HTTPMethod {
+//        switch self {
+//        case .profileRevise: return .put
+//        }
+//    }
+//
+//    var endPoint: URL! {
+//        return URL(string: baseURL + path)
+//    }
+//
+//    var header: HTTPHeaders {
+//        guard let headerKey = Bundle.main.object(forInfoDictionaryKey: "SesacKey") as? String else { return .init() }
+//
+//        guard let token = Bundle.main.object(forInfoDictionaryKey: "AccessToken") as? String else { return .init() }
+//
+//        switch self {
+//        case .profileRevise:
+//            return [
+//                "SesacKey": headerKey,
+//                "Authorization": token,
+//                "Content-Type": "multipart/form-data"
+//            ]
+//        }
+//    }
+//
+//    var parameter: Parameters {
+//        switch self {
+//        case .profileRevise(let nick, let profile):
+//            if let nick = nick, let profile = profile {
+//                return [
+//                    "nick": nick,
+//                    "profile": profile
+//                ]
+//            }
+//            return .init()
+//        }
+//    }
+//}
