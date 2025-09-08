@@ -42,9 +42,15 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
         return label
     }()
 
-    // TODO: AttributedString 취소선으로 변경
-    private let rawPrice: UILabel = {
+    private let cancelLineView: UIView = {
+        let view = UIView()
+        view.backgroundColor = ColorSet.lightGray.color
+        return view
+    }()
+
+    private lazy var rawPrice: UILabel = {
         let label = UILabel()
+        label.addSubview(cancelLineView)
         label.text = "원가"
         label.textColor = ColorSet.lightGray.color
         label.font = .boldSystemFont(ofSize: 14)
@@ -121,6 +127,12 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-20)
         }
+
+        cancelLineView.snp.makeConstraints { make in
+            make.directionalHorizontalEdges.equalToSuperview()
+            make.center.equalToSuperview()
+            make.height.equalTo(2)
+        }
     }
 
     override func configureView() {
@@ -148,8 +160,10 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
 
         if data.bindSalePrice == "무료" {
             rawPrice.isHidden = true
+            price.textColor = ColorSet.orange.color
         } else {
             rawPrice.isHidden = false
+            price.textColor = .black
         }
 
         heartButton.isSelected = data.isLiked
