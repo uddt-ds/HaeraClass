@@ -24,7 +24,6 @@ final class CommentEditViewController: BaseViewController {
     
     private let categoryTag: UIButton = {
         let button = UIButton()
-        button.setTitle("테스트", for: .normal)
         button.setTitleColor(ColorSet.lightOrange.color, for: .normal)
         button.titleLabel?.font = .boldSystemFont(ofSize: 10)
         button.layer.borderColor = ColorSet.lightOrange.color.cgColor

@@ -16,7 +16,6 @@ final class ClassCategoryCell: BaseCollectionViewCell, ReusableViewProtocol {
 
     fileprivate let button: UIButton = {
         let button = UIButton()
-        button.setTitle("테스트", for: .normal)
         button.setTitleColor(ColorSet.lightGray.color, for: .normal)
         button.setTitleColor(ColorSet.lightOrange.color, for: .selected)
         button.titleLabel?.font = .boldSystemFont(ofSize: 14)
