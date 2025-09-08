@@ -15,6 +15,12 @@ final class ClassDetailViewModel: ViewModelProtocol {
     let className: String
     let category: Int
 
+    init(classId: String, className: String, category: Int) {
+        self.classId = classId
+        self.className = className
+        self.category = category
+    }
+
     private var disposeBag = DisposeBag()
 
     private let networkManager = NetworkManager.shared
@@ -105,7 +111,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
             .disposed(by: disposeBag)
 
         isLiked
-            .map { $0 ? "클래스를 찜했습니다" : "클래스 찜을 취소했습니다" }
+            .map { $0 ? Message.isLiked.title : Message.isNotLiked.title }
             .bind(to: saveResult)
             .disposed(by: disposeBag)
 
@@ -117,7 +123,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
             .bind(with: self) { owner, responseData in
                 switch responseData {
                 case .success(let value):
-                    commentCount.accept("댓글보기 (\(value.data.count))")
+                    commentCount.accept(Message.showComment(value.data.count).title)
                 case .failure(let error):
                     errorMessage.accept(error.errorMessage)
                 }
@@ -126,10 +132,20 @@ final class ClassDetailViewModel: ViewModelProtocol {
 
         return Output(detailData: detailData, photoData: photoData, commentData: commentData, selectedClassId: selectedClassId, saveResult: saveResult, commentCount: commentCount, errorMessage: errorMessage)
     }
+}
 
-    init(classId: String, className: String, category: Int) {
-        self.classId = classId
-        self.className = className
-        self.category = category
+extension ClassDetailViewModel {
+    enum Message {
+        case isLiked
+        case isNotLiked
+        case showComment(Int)
+
+        var title: String {
+            switch self {
+            case .isLiked: return "클래스를 찜했습니다"
+            case .isNotLiked: return "클래스 찜을 취소했습니다"
+            case .showComment(let count): return "댓글보기 (\(count))"
+            }
+        }
     }
 }
