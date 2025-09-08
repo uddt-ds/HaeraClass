@@ -117,7 +117,7 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
         }
 
         heartButton.snp.makeConstraints { make in
-            make.size.equalTo(24)
+            make.size.equalTo(32)
             make.centerY.equalToSuperview()
             make.trailing.equalToSuperview().offset(-20)
         }
@@ -154,9 +154,11 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
         }
 
         heartButton.isSelected = data.isLiked
-        //하트 버튼을 눌렀을 때, UI는 기본적으로 변하게 하기
-        //하트 버튼을 눌렀을 때 서버와 통신해서 Boolean 값 변경하기
-        //String message는 별도로 처리해야하는데 하나씩 순서대로 처리
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        heartButton.isSelected = false
     }
 }
 

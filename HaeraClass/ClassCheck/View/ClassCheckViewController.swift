@@ -116,7 +116,7 @@ extension ClassCheckViewController {
                 cell.configureCell(with: element)
                 cell.rx.heartButtonTap
                     .map { value in
-                        let changeButtonState = !value
+                        let changeButtonState = value
                         cell.updateHeartButton()
                         return (element.classId, changeButtonState)
                     }

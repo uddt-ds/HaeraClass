@@ -13,7 +13,7 @@ import Kingfisher
 
 final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol {
 
-    let disposeBag = DisposeBag()
+    var disposeBag = DisposeBag()
 
     private let classImageView: UIImageView = {
         let imageView = UIImageView()
@@ -204,6 +204,11 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
             heartButton.setImage(.likeButton, for: .normal)
         }
         print(heartButton.isSelected)
+    }
+
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        disposeBag = DisposeBag()
     }
 }
 
