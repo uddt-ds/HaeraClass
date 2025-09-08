@@ -29,7 +29,6 @@ final class ClassDetailViewController: BaseViewController {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 15
-        imageView.backgroundColor = .blue
         imageView.clipsToBounds = true
         return imageView
     }()

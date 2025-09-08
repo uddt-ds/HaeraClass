@@ -7,6 +7,7 @@
 
 import Foundation
 import Kingfisher
+import UIKit
 
 extension KingfisherWrapper where Base: KFCrossPlatformImageView {
     @MainActor @discardableResult
@@ -14,7 +15,7 @@ extension KingfisherWrapper where Base: KFCrossPlatformImageView {
         KingfisherManager.shared.setHeaderes()
         return setImage(
             with: resource,
-            placeholder: nil,
+            placeholder: UIImage.noProfile,
             options: nil,
             progressBlock: nil,
             completionHandler: nil)

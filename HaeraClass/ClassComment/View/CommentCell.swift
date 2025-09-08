@@ -18,7 +18,6 @@ final class CommentCell: BaseTableViewCell, ReusableViewProtocol {
         imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 15
         imageView.clipsToBounds = true
-        imageView.backgroundColor = .blue
         return imageView
     }()
 
