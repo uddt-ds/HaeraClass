@@ -19,7 +19,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
         let viewWillAppearTrigger: PublishSubject<Void>
         let searchText: ControlProperty<String>
         let searchButtonTapped:  ControlEvent<Void>
-        let heartButtonTapped: BehaviorSubject<(String, Bool)>
+        let heartButtonTapped: PublishSubject<(String, Bool)>
     }
 
 

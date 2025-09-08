@@ -97,7 +97,7 @@ extension ClassSearchViewController {
     private func bind() {
         // 버튼이 눌렸을 때 현재 상태가 가져와짐
 
-        let heartButtonTap = BehaviorSubject(value: ("", false))
+        let heartButtonTap = PublishSubject<(String, Bool)>()
 
         let input = ClassSearchViewModel.Input(viewWillAppearTrigger: viewWillAppearTrigger,searchText: searchBar.rx.text.orEmpty, searchButtonTapped: searchBar.rx.searchButtonClicked, heartButtonTapped: heartButtonTap)
 
