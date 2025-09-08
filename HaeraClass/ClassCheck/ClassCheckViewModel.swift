@@ -24,7 +24,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
         let selectedCategory: BehaviorRelay<Int>
         let currentButtonState: BehaviorRelay<Bool>
         let sortButtonTap: ControlEvent<Void>
-        let heartButtonTapped: BehaviorSubject<(String, Bool)>
+        let heartButtonTapped: PublishSubject<(String, Bool)>
     }
 
     struct State {

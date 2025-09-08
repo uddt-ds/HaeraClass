@@ -110,7 +110,7 @@ extension ClassCheckViewController {
 
         let selectedCategory = BehaviorRelay(value: 0)
 
-        let heartButtonTap = BehaviorSubject(value: ("", false))
+        let heartButtonTap = PublishSubject<(String, Bool)>()
 
         let input = ClassCheckViewModel.Input(viewWillAppearTrigger: viewWillAppearTrigger, initialSet: Observable.just(()), selectedCategory: selectedCategory, currentButtonState: buttonState, sortButtonTap: sortButton.rx.tap, heartButtonTapped: heartButtonTap)
 
