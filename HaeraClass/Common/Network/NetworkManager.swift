@@ -16,7 +16,7 @@ final class NetworkManager {
 
     private init() { }
 
-    func fetchData<T: Decodable>(router: Router, type: T.Type) -> Single<Result<T, AFError>> {
+    func fetchData<T: Decodable>(router: Router, type: T.Type) -> Single<Result<T, CustomNetworkError>> {
         return Single.create { value in
             AF.request(router.endPoint,
                        method: router.method,
@@ -29,7 +29,13 @@ final class NetworkManager {
                 case .success(let data):
                     value(.success(.success(data)))
                 case .failure(let error):
-                    value(.success(.failure(error)))
+                    if let data = responseData.data {
+                        guard let decodedData = try? JSONDecoder().decode(ServerError.self, from: data) else { return }
+                        let error = CustomNetworkError.serverError(message: decodedData.message)
+                        print(error)
+                        value(.success(.failure(.serverError(message: decodedData.message))))
+                    }
+                    value(.success(.failure(.serverError(message: ""))))
                 }
             }
             return Disposables.create()

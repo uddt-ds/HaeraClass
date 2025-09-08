@@ -27,6 +27,7 @@ final class LoginViewModel: ViewModelProtocol {
         let loginValue: PublishRelay<Login>
         let loginResult: PublishRelay<Bool>
         let loginButtonState: PublishRelay<Bool>
+        let errorMessage: PublishRelay<String>
     }
 
     func transform(input: Input) -> Output {
@@ -34,6 +35,7 @@ final class LoginViewModel: ViewModelProtocol {
         let loginValue = PublishRelay<Login>()
         let loginResult = PublishRelay<Bool>()
         let loginButtonState = PublishRelay<Bool>()
+        let errorMessage = PublishRelay<String>()
 
         let textFieldInput = Observable.combineLatest(input.idTextField, input.pwTextField)
 
@@ -56,8 +58,7 @@ final class LoginViewModel: ViewModelProtocol {
         input.loginButtonTapped
             .withLatestFrom(textFieldInput)
             .withUnretained(self)
-            .debug()
-            .flatMap { owner, value -> Single<Result<Login, AFError>> in
+            .flatMap { owner, value -> Single<Result<Login, CustomNetworkError>> in
                 let (id, pw) = value
                 return owner.networkManager.fetchData(router: .login(email: id, pw: pw), type: Login.self)
             }
@@ -68,10 +69,11 @@ final class LoginViewModel: ViewModelProtocol {
                     UserDefaults.standard.set(data.userId, forKey: "userId")
                     UserDefaults.standard.set(data.accessToken, forKey: "token")
                 case .failure(let error):
-                    print(error)
+                    errorMessage.accept(error.errorMessage)
                 }
             }
             .disposed(by: disposeBag)
+
 
         validateResult
             .bind(with: self) { owner, value in
@@ -93,7 +95,7 @@ final class LoginViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
-        return Output(validateResult: validateResult, loginValue: loginValue, loginResult: loginResult, loginButtonState: loginButtonState)
+        return Output(validateResult: validateResult, loginValue: loginValue, loginResult: loginResult, loginButtonState: loginButtonState, errorMessage: errorMessage)
     }
 
 

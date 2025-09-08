@@ -184,6 +184,12 @@ extension LoginViewController {
                 owner.buttonState(value)
             })
             .disposed(by: disposeBag)
+
+        output.errorMessage
+            .bind(with: self) { owner, value in
+                AlertManager.shared.showBasicAlert(value)
+            }
+            .disposed(by: disposeBag)
     }
 
     private func bindGesture() {
