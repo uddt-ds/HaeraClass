@@ -27,7 +27,7 @@ final class DateManager {
     }
 
     static func getRelativeDate(value: String?) -> String {
-        formatter.dateFormat = "yyy-MM-dd'T'HH:mm:ss.SSSZ"
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
         formatter.timeZone = TimeZone(secondsFromGMT: 0)
         guard let date = formatter.date(from: value ?? "") else { return "" }
 
