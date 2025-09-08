@@ -14,6 +14,8 @@ class SettingViewController: BaseViewController {
 
     let disposeBag = DisposeBag()
 
+    let viewModel = SettingViewModel()
+
     let alertManager = AlertManager.shared
 
     let logoutButton: UIButton = {
@@ -53,14 +55,22 @@ class SettingViewController: BaseViewController {
 extension SettingViewController {
     private func bind() {
 
-        logoutButton.rx.tap
-            .bind(with: self) { owner, _ in
-                owner.alertManager.showLogoutAlert("정말 로그아웃 하시겠습니까?") {
+        let input = SettingViewModel.Input(okAlertTapped: logoutButton.rx.tap)
+
+        let output = viewModel.transform(input: input)
+
+        output.logoutMessage
+            .bind(with: self) { owner, value in
+                owner.alertManager.showLogoutAlert(value) {
                     guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                           let sceneDelegate = windowScene.delegate as? SceneDelegate else { return }
                     let vc = LoginViewController()
                     sceneDelegate.window?.rootViewController = vc
                     sceneDelegate.window?.makeKeyAndVisible()
+
+                    guard let window = sceneDelegate.window else { return }
+
+                    UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve) { }
                 }
             }
             .disposed(by: disposeBag)
