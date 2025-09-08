@@ -100,8 +100,8 @@ final class ClassCheckViewModel: ViewModelProtocol {
                 if value == 0 {
                     state.currentCategories.removeAll()
                     selectedCategories.accept([0])
-                    state.totalData.accept(selectedData.value)
-                    totalCount.accept("\(selectedData.value.count)개")
+                    selectedData.accept(state.totalData.value)
+                    totalCount.accept("\(state.totalData.value.count)개")
                 } else {
                     if !state.currentCategories.contains(value) {
                         state.currentCategories.insert(value)
@@ -114,7 +114,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
                     if state.currentCategories == [] {
                         selectedCategories.accept([0])
                         selectedData.accept(state.totalData.value)
-                        totalCount.accept("\(state.totalData.value.count)개")
+                        totalCount.accept("\(selectedData.value.count)개")
                     } else {
                         let data = state.totalData.value.filter { state.currentCategories.contains($0.category) }
                         selectedData.accept(data)
