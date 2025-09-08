@@ -29,20 +29,33 @@ final class NetworkManager {
                 case .success(let data):
                     value(.success(.success(data)))
                 case .failure(let error):
-                    if let data = responseData.data {
-                        guard let decodedData = try? JSONDecoder().decode(ServerError.self, from: data) else { return }
-                        let error = CustomNetworkError.serverError(message: decodedData.message)
-                        print(error)
-                        value(.success(.failure(.serverError(message: decodedData.message))))
+
+                    if let urlError = error.underlyingError as? URLError {
+                        switch urlError.code {
+                        case .notConnectedToInternet:
+                            value(.success(.failure(.noInternet)))
+                        default:
+                            value(.success(.failure(.unknown)))
+                        }
+                        return
                     }
-                    value(.success(.failure(.serverError(message: ""))))
+
+                    if let data = responseData.data {
+                        if let decodedData = try? JSONDecoder().decode(ServerError.self, from: data) {
+                            value(.success(.failure(.serverError(message: decodedData.message))))
+                            return
+                        } else {
+                            value(.success(.failure(.decodingError)))
+                        }
+                    }
                 }
+                value(.success(.failure(.unknown)))
             }
             return Disposables.create()
         }
     }
 
-    func getData<T: Decodable>(router: Router, type: T.Type) -> Single<Result<T, AFError>> {
+    func getData<T: Decodable>(router: Router, type: T.Type) -> Single<Result<T, CustomNetworkError>> {
         return Single.create { value in
             AF.request(router.endPoint,
                        parameters: router.parameter,
@@ -53,8 +66,27 @@ final class NetworkManager {
                 case .success(let data):
                     value(.success(.success(data)))
                 case .failure(let error):
-                    value(.success(.failure(error)))
+
+                    if let urlError = error.underlyingError as? URLError {
+                        switch urlError.code {
+                        case .notConnectedToInternet:
+                            value(.success(.failure(.noInternet)))
+                        default:
+                            value(.success(.failure(.unknown)))
+                        }
+                        return
+                    }
+
+                    if let data = responseData.data {
+                        if let decodedData = try? JSONDecoder().decode(ServerError.self, from: data) {
+                            value(.success(.failure(.serverError(message: decodedData.message))))
+                            return
+                        } else {
+                            value(.success(.failure(.decodingError)))
+                        }
+                    }
                 }
+                value(.success(.failure(.unknown)))
             }
             return Disposables.create()
         }
