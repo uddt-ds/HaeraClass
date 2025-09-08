@@ -33,7 +33,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
     func transform(input: Input) -> Output {
 
         let searchResult = PublishRelay<[Data]>()
-        let searchResultLabel = BehaviorRelay(value: "원하는 클래스가 있으신가요?")
+        let searchResultLabel = BehaviorRelay(value: Message.greeting.rawValue)
         let isLiked = PublishRelay<Bool>()
         let saveResult = PublishRelay<String>()
         let errorMessage = PublishRelay<String>()
@@ -50,7 +50,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
                     searchResult.accept(responseData.data)
 
                     if responseData.data.count == 0 {
-                        searchResultLabel.accept("검색 결과가 없습니다")
+                        searchResultLabel.accept(Message.noResult.rawValue)
                     } else {
                         searchResultLabel.accept("")
                     }
@@ -76,7 +76,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
                     searchResult.accept(responseData.data)
 
                     if responseData.data.count == 0 {
-                        searchResultLabel.accept("검색 결과가 없습니다")
+                        searchResultLabel.accept(Message.noResult.rawValue)
                     } else {
                         searchResultLabel.accept("")
                     }
@@ -104,12 +104,21 @@ final class ClassSearchViewModel: ViewModelProtocol {
             .disposed(by: disposeBag)
 
         isLiked
-            .map { $0 ? "클래스를 찜했습니다" : "클래스 찜을 취소했습니다" }
+            .map { $0 ? Message.isLiked.rawValue : Message.isNotLiked.rawValue }
             .bind(with: self) { owner, value in
                 saveResult.accept(value)
             }
             .disposed(by: disposeBag)
 
         return Output(searchResult: searchResult, searchResultLabel: searchResultLabel, saveResult: saveResult, errorMessage: errorMessage)
+    }
+}
+
+extension ClassSearchViewModel {
+    enum Message: String {
+        case isLiked = "클래스를 찜했습니다"
+        case isNotLiked = "클래스 찜을 취소했습니다"
+        case noResult = "검색 결과가 없습니다"
+        case greeting = "원하는 클래스가 있으신가요?"
     }
 }

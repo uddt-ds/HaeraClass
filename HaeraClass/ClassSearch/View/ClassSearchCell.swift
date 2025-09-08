@@ -24,7 +24,6 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
 
     private let categoryTag: UIButton = {
         let button = UIButton()
-        button.setTitle("테스트", for: .normal)
         button.setTitleColor(ColorSet.lightOrange.color, for: .normal)
         button.titleLabel?.font = .boldSystemFont(ofSize: 10)
         button.layer.borderColor = ColorSet.lightOrange.color.cgColor
@@ -36,7 +35,6 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
 
     private let headTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "테스트"
         label.textColor = .black
         label.font = .boldSystemFont(ofSize: 14)
         return label
@@ -51,7 +49,6 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
     private lazy var rawPrice: UILabel = {
         let label = UILabel()
         label.addSubview(cancelLineView)
-        label.text = "원가"
         label.textColor = ColorSet.lightGray.color
         label.font = .boldSystemFont(ofSize: 14)
         return label
@@ -59,7 +56,6 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
 
     private let price: UILabel = {
         let label = UILabel()
-        label.text = "정가"
         label.textColor = .black
         label.font = .boldSystemFont(ofSize: 14)
         return label
@@ -67,7 +63,6 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
 
     private let percentLabel: UILabel = {
         let label = UILabel()
-        label.text = "정가"
         label.textColor = ColorSet.orange.color
         label.font = .boldSystemFont(ofSize: 14)
         return label
