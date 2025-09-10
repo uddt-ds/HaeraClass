@@ -116,7 +116,7 @@ extension ClassCheckViewController {
         output.selectedData
             .bind(to: tableView.rx.items(cellIdentifier: ClassCategoryTableViewCell.identifier, cellType:ClassCategoryTableViewCell.self)) { (row, element, cell) in
                 cell.configureCell(with: element)
-                cell.rx.heartButtonTap
+                cell.rx.heartButtonIsSelected
                     .map { value in
                         let changeButtonState = value
                         cell.updateHeartButton()

@@ -224,7 +224,7 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
 }
 
 extension Reactive where Base: ClassCategoryTableViewCell {
-    var heartButtonTap: Observable<Bool> {
+    var heartButtonIsSelected: Observable<Bool> {
         return base.heartButton.rx.tap
             .map {
                 base.heartButton.isSelected.toggle()
