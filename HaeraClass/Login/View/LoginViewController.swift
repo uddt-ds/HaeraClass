@@ -155,25 +155,10 @@ extension LoginViewController {
             .bind(to: validateLabel.rx.text)
             .disposed(by: disposeBag)
 
-        output.loginValue
-            .bind(with: self) { owner, value in
-                UserDefaults.standard.set(value.accessToken, forKey: "token")
-            }
-            .disposed(by: disposeBag)
-
         output.loginResult
             .bind(with: self) { owner, value in
                 if value {
-                    guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                          let sceneDelegate = windowScene.delegate as? SceneDelegate else { return }
-
-                    let tabBar = TabBarController()
-                    sceneDelegate.window?.rootViewController = tabBar
-                    sceneDelegate.window?.makeKeyAndVisible()
-
-                    guard let window = sceneDelegate.window else { return }
-
-                    UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve) { }
+                    owner.changeRootViewController()
                 }
             }
             .disposed(by: disposeBag)
@@ -198,6 +183,21 @@ extension LoginViewController {
                 owner.resignFirstResponder()
             }
             .disposed(by: disposeBag)
+    }
+}
+
+extension LoginViewController {
+    private func changeRootViewController() {
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              let sceneDelegate = windowScene.delegate as? SceneDelegate else { return }
+
+        let tabBar = TabBarController()
+        sceneDelegate.window?.rootViewController = tabBar
+        sceneDelegate.window?.makeKeyAndVisible()
+
+        guard let window = sceneDelegate.window else { return }
+
+        UIView.transition(with: window, duration: 0.5, options: .transitionCrossDissolve) { }
     }
 }
 
