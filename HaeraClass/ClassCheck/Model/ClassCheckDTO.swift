@@ -37,11 +37,13 @@ struct Data: Decodable {
     }
 
     func toDomain() -> ClassCheck {
-        return .init(categoryTitle: categoryTitle,
+        return .init(classId: classId,
+                categoryTitle: categoryTitle,
                      category: category,
                      title: title,
                      description: description,
                      price: bindPrice,
+                     priceValue: price ?? 0,
                      salePrice: bindSalePrice,
                      createdAt: createdAt,
                      imageUrl: bindImageUrl,

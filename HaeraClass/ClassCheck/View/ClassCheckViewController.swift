@@ -157,7 +157,7 @@ extension ClassCheckViewController {
             }
             .disposed(by: disposeBag)
 
-        tableView.rx.modelSelected(Data.self)
+        tableView.rx.modelSelected(ClassCheck.self)
             .bind(with: self) { owner, data in
                 let viewModel = ClassDetailViewModel(classId: data.classId, className: data.title, category: data.category)
                 let vc = ClassDetailViewController(viewModel: viewModel)

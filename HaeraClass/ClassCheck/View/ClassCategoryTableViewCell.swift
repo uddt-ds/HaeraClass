@@ -176,7 +176,7 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
         super.configureView()
     }
 
-    func configureCell(with data: Data) {
+    func configureCell(with data: ClassCheck) {
         guard let headerKey = Bundle.main.object(forInfoDictionaryKey: "SesacKey") as? String else { return }
 
         let modifier = AnyModifier { request in
@@ -186,7 +186,7 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
             return header
         }
 
-        classImageView.kf.setImage(with: data.bindImageUrl,
+        classImageView.kf.setImage(with: data.imageUrl,
                                    options: [
                                     .requestModifier(modifier)
                                    ]
@@ -194,13 +194,13 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
         headTitleLabel.text = data.title
         categoryTag.setTitle(data.categoryTitle, for: .normal)
         contentTitle.text = data.description
-        rawPrice.text = data.bindPrice
-        price.text = data.bindSalePrice
+        rawPrice.text = data.price
+        price.text = data.salePrice
         percentLabel.text = data.persent
 
         heartButton.isSelected = data.isLiked
         
-        if data.bindSalePrice == "무료" {
+        if data.salePrice == "무료" {
             rawPrice.isHidden = true
             price.textColor = ColorSet.orange.color
         } else {

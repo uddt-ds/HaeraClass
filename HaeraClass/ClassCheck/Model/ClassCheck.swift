@@ -8,11 +8,13 @@
 import Foundation
 
 struct ClassCheck {
+    let classId: String
     let categoryTitle: String
     let category: Int  // UI 미사용 : 필터용
     let title: String
     let description: String
     let price: String
+    let priceValue: Int // UI 미사용 : 정렬용
     let salePrice: String
     let createdAt: String // UI 미사용 : 정렬용
     let imageUrl: URL?
@@ -20,5 +22,3 @@ struct ClassCheck {
     let isLiked: Bool
     let creator: Creator
 }
-
-// 
