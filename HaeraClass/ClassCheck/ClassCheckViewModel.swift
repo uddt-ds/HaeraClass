@@ -16,7 +16,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
 
     private var disposeBag = DisposeBag()
 
-    var datas: [Data] = []
+    private var datas: [ClassCheck] = []
 
     struct Input {
         let viewWillAppearTrigger: PublishSubject<Void>
@@ -28,12 +28,12 @@ final class ClassCheckViewModel: ViewModelProtocol {
     }
 
     struct State {
-        let totalData: BehaviorRelay<[Data]>
+        let totalData: BehaviorRelay<[ClassCheck]>
         var currentCategories: Set<Int>
     }
 
     struct Output {
-        let selectedData: BehaviorRelay<[Data]>
+        let selectedData: BehaviorRelay<[ClassCheck]>
         let totalCount: PublishRelay<String>
         let buttonItems: BehaviorRelay<[CategoryTitle]>
         let saveResult: PublishRelay<String>
@@ -43,13 +43,12 @@ final class ClassCheckViewModel: ViewModelProtocol {
 
     func transform(input: Input) -> Output {
 
+        var state = State(totalData: BehaviorRelay(value: []), currentCategories: [])
+
         let buttonTitles = CategoryTitle.allCases
+        let buttonItems = BehaviorRelay<[CategoryTitle]>(value: buttonTitles)
 
-        let buttonItems: BehaviorRelay<[CategoryTitle]> = .init(value: buttonTitles)
-
-        var state = State(totalData: .init(value: []), currentCategories: [])
-
-        let selectedData: BehaviorRelay<[Data]> = BehaviorRelay(value: [])
+        let selectedData = BehaviorRelay<[ClassCheck]>(value: [])
         let totalCount = PublishRelay<String>()
 
         let isLiked = PublishRelay<Bool>()
@@ -62,18 +61,19 @@ final class ClassCheckViewModel: ViewModelProtocol {
         input.viewWillAppearTrigger
             .withUnretained(self)
             .flatMap { owner, _ in
-                owner.networkManager.getData(router: .classCheck, type: ClassCheck.self)
+                owner.networkManager.getData(router: .classCheck, type: ClassCheckDTO.self)
             }
             .bind(with: self) { owner, value in
                 switch value {
                 case .success(let response):
 
-                    state.totalData.accept(response.data)
+                    let data = response.data.map { $0.toDomain() }
+                    state.totalData.accept(data)
 
                     if state.currentCategories.isEmpty || state.currentCategories.contains(0) {
-                        selectedData.accept(response.data)
+                        selectedData.accept(data)
                     } else {
-                        let filterData = response.data.filter { state.currentCategories.contains($0.category) }
+                        let filterData = data.filter { state.currentCategories.contains($0.category) }
                         selectedData.accept(filterData)
                     }
 
@@ -85,40 +85,12 @@ final class ClassCheckViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
-        input.initialSet
-            .withUnretained(self)
-            .flatMap { owner, _ in
-                owner.networkManager.getData(router: .classCheck, type: ClassCheck.self)
-            }
-            .bind(with: self) { owner, value in
-                switch value {
-                case .success(let response):
-                    state.totalData.accept(response.data)
-                    selectedData.accept(response.data)
-                    let totalTitle = "\(response.data.count)개"
-                    totalCount.accept(totalTitle)
-                case .failure(let error):
-                    errorMessage.accept(error.errorMessage)
-                }
-            }
-            .disposed(by: disposeBag)
-
         input.sortButtonTap
             .withLatestFrom(input.currentButtonState)
-            .map { value in
-                if value {
-                    let data = selectedData.value
-                    let sortedArr = data.sorted { lhs, rhs in
-                        return lhs.createdAt > rhs.createdAt
-                    }
-                    return sortedArr
-                } else {
-                    let data = selectedData.value
-                    let sortedArr = data.sorted { lhs, rhs in
-                        return lhs.price ?? 0 > rhs.price ?? 0
-                    }
-                    return sortedArr
-                }
+            .withUnretained(self)
+            .map { owner, sortedToggle in
+                let data = selectedData.value
+                return owner.sortCurrentData(with: data, value: !sortedToggle)
             }
             .bind(with: self) { owner, value in
                 selectedData.accept(value)
@@ -126,40 +98,48 @@ final class ClassCheckViewModel: ViewModelProtocol {
             .disposed(by: disposeBag)
 
         input.selectedCategory
-            .withLatestFrom(input.currentButtonState) { category, sortValue in
-                return (category, sortValue)
+            .withLatestFrom(input.currentButtonState) { category, sortedToggle in
+                return (category, sortedToggle)
             }
             .bind(with: self) { owner, value in
-                let (category, sortValue) = value
+                let (category, sortedToggle) = value
                 if category == 0 {
                     state.currentCategories.removeAll()
-                    selectedCategories.accept([0])
-                    let data = owner.sort(with: state.totalData.value, value: sortValue)
-                    selectedData.accept(data)
-                    totalCount.accept("\(state.totalData.value.count)개")
+                    state.currentCategories.insert(0)
+                    selectedData.accept(state.totalData.value)
                 } else {
-                    if !state.currentCategories.contains(category) {
-                        state.currentCategories.insert(category)
-                        selectedCategories.accept(state.currentCategories)
-                    } else {
-                        state.currentCategories.remove(category)
-                        selectedCategories.accept(state.currentCategories)
+                    if state.currentCategories.contains(0) {
+                        state.currentCategories.removeAll()
                     }
 
-                    if state.currentCategories == [] {
-                        selectedCategories.accept([0])
-                        let data = owner.sort(with: state.totalData.value, value: sortValue)
+                    if state.currentCategories.contains(category) {
+                        state.currentCategories.remove(category)
+                        let data = selectedData.value.filter { $0.category != category }
                         selectedData.accept(data)
-                        totalCount.accept("\(selectedData.value.count)개")
-                    } else {
-                        let data = state.totalData.value.filter { state.currentCategories.contains($0.category) }
-                        let sortedData = owner.sort(with: data, value: sortValue)
-                        selectedData.accept(sortedData)
-                        totalCount.accept("\(selectedData.value.count)개")
+
+                        if state.currentCategories.count == 0 {
+                            state.currentCategories.insert(0)
+                            selectedData.accept(state.totalData.value)
+                        }
+
+                    } else if !state.currentCategories.contains(category){
+                        if !state.currentCategories.contains(0) {
+                            state.currentCategories.insert(category)
+                            let totalData = state.totalData.value
+                            let data = totalData.filter { state.currentCategories.contains($0.category) }
+                            selectedData.accept(data)
+                        }
                     }
                 }
+
+                let sorttedData = owner.sortCurrentData(with: selectedData.value, value: sortedToggle)
+                selectedData.accept(sorttedData)
+                totalCount.accept("\(selectedData.value.count)개")
+
+                selectedCategories.accept(state.currentCategories)
             }
             .disposed(by: disposeBag)
+
 
         input.heartButtonTapped
             .withUnretained(self)
@@ -185,20 +165,26 @@ final class ClassCheckViewModel: ViewModelProtocol {
             .disposed(by: disposeBag)
 
 
-        return Output(selectedData: selectedData, totalCount: totalCount, buttonItems: buttonItems, saveResult: saveResult, selectedCategories: selectedCategories, errorMessage: errorMessage)
+        return Output(selectedData: selectedData,
+                      totalCount: totalCount,
+                      buttonItems: buttonItems,
+                      saveResult: saveResult,
+                      selectedCategories: selectedCategories,
+                      errorMessage: errorMessage)
     }
 
-    private func sort(with data: [Data], value: Bool) -> [Data] {
+    private func sortCurrentData(with data: [ClassCheck], value: Bool) -> [ClassCheck] {
+        let sortedArr = data.sorted { lhs, rhs in
+            return lhs.createdAt > rhs.createdAt
+        }
+
         if !value {
-            let sortedArr = data.sorted { lhs, rhs in
-                return lhs.createdAt > rhs.createdAt
-            }
             return sortedArr
         } else {
-            let sortedArr = data.sorted { lhs, rhs in
-                return lhs.price ?? 0 > rhs.price ?? 0
+            let priceSortedArr = sortedArr.sorted { lhs, rhs in
+                return lhs.priceValue > rhs.priceValue
             }
-            return sortedArr
+            return priceSortedArr
         }
     }
 }
