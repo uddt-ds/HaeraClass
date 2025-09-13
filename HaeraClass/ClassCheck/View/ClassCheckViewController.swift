@@ -28,7 +28,6 @@ final class ClassCheckViewController: BaseViewController {
 
     private let totalLabel: UILabel = {
         let label = UILabel()
-        label.text = "테스트"
         label.textColor = .black
         label.font = .boldSystemFont(ofSize: 14)
         return label
