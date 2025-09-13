@@ -177,10 +177,20 @@ extension ClassCheckViewController {
                 AlertManager.shared.showBasicAlert(value)
             }
             .disposed(by: disposeBag)
+
+        output.scrollGoToTopTrigger
+            .withLatestFrom(tableView.rx.contentOffset)
+            .debug()
+            .bind(with: self) { owner, value in
+                if value.y != 0 {
+                    DispatchQueue.main.async {
+                        owner.tableView.setContentOffset(.init(x: 0, y: 0), animated: true)
+                    }
+                }
+            }
+            .disposed(by: disposeBag)
     }
-
 }
-
 extension ClassCheckViewController {
     private func makeCollectionViewFlowLayout() -> UICollectionViewFlowLayout {
         typealias Collection = CollectionViewFigureSet

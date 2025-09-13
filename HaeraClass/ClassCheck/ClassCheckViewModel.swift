@@ -39,6 +39,8 @@ final class ClassCheckViewModel: ViewModelProtocol {
         let saveResult: PublishRelay<String>
         let selectedCategories: BehaviorRelay<Set<Int>>
         let errorMessage: PublishRelay<String>
+        let scrollGoToTopTrigger: PublishRelay<Void>
+
     }
 
     func transform(input: Input) -> Output {
@@ -56,7 +58,9 @@ final class ClassCheckViewModel: ViewModelProtocol {
 
         let errorMessage = PublishRelay<String>()
 
-        let selectedCategories: BehaviorRelay<Set<Int>> = BehaviorRelay(value: state.currentCategories)
+        let selectedCategories = BehaviorRelay(value: state.currentCategories)
+
+        let scrollGoToTopTrigger = PublishRelay<Void>()
 
         input.viewWillAppearTrigger
             .withUnretained(self)
@@ -94,6 +98,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
             }
             .bind(with: self) { owner, value in
                 selectedData.accept(value)
+                scrollGoToTopTrigger.accept(())
             }
             .disposed(by: disposeBag)
 
@@ -137,6 +142,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
                 totalCount.accept("\(selectedData.value.count)개")
 
                 selectedCategories.accept(state.currentCategories)
+                scrollGoToTopTrigger.accept(())
             }
             .disposed(by: disposeBag)
 
@@ -170,7 +176,8 @@ final class ClassCheckViewModel: ViewModelProtocol {
                       buttonItems: buttonItems,
                       saveResult: saveResult,
                       selectedCategories: selectedCategories,
-                      errorMessage: errorMessage)
+                      errorMessage: errorMessage,
+                      scrollGoToTopTrigger: scrollGoToTopTrigger)
     }
 
     private func sortCurrentData(with data: [ClassCheck], value: Bool) -> [ClassCheck] {
