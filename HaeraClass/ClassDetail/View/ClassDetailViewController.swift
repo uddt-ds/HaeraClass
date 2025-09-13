@@ -181,8 +181,8 @@ final class ClassDetailViewController: BaseViewController {
     }
 
     private func configureDetailView(data: ClassDetail) {
-        profileImageView.kf.setImageWithHeaders(with: data.creator.bindImageUrl)
-        nickLabel.text = data.creator.nick
+        profileImageView.kf.setImageWithHeaders(with: data.profileImage)
+        nickLabel.text = data.creatorNick
         classInfoView.configureInfoView(data: data)
         introTextView.text = data.description
         heartButton.isSelected = data.isLiked

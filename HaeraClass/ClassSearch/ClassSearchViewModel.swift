@@ -42,7 +42,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
             .withLatestFrom(input.searchText)
             .withUnretained(self)
             .flatMap { owner, value in
-                return owner.networkManager.getData(router: .classSearch(title: value), type: ClassCheck.self)
+                return owner.networkManager.getData(router: .classSearch(title: value), type: ClassCheckDTO.self)
             }
             .bind(with: self) { owner, responseData in
                 switch responseData {
@@ -68,7 +68,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
             .filter { $0.count > 0 }
             .withUnretained(self)
             .flatMap { owner, value in
-                return owner.networkManager.getData(router: .classSearch(title: value), type: ClassCheck.self)
+                return owner.networkManager.getData(router: .classSearch(title: value), type: ClassCheckDTO.self)
             }
             .bind(with: self) { owner, responseData in
                 switch responseData {

@@ -61,12 +61,12 @@ final class ClassDetailViewModel: ViewModelProtocol {
         viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
-                return owner.networkManager.getData(router: .classDetail(classId: owner.classId), type: ClassDetail.self)
+                return owner.networkManager.getData(router: .classDetail(classId: owner.classId), type: ClassDetailDTO.self)
             }
             .bind(with: self) { owner, responseData in
                 switch responseData {
                 case .success(let data):
-                    detailData.accept(data)
+                    detailData.accept(data.makeToEntity())
                     photoData.accept(data.imageUrls)
                 case .failure(let error):
                     errorMessage.accept(error.errorMessage)

@@ -170,13 +170,9 @@ final class ClassInfoView: UIView {
     func configureInfoView(data: ClassDetail) {
         let date = DateManager.setupDate(value: data.date)
 
-        locationDetailLabel.text = data.location ?? "미정"
+        locationDetailLabel.text = data.location
         timeDetailLabel.text = date
-        if data.capacity == nil {
-            peopleDetailLabel.text = "미정"
-        } else {
-            peopleDetailLabel.text = "\(data.capacity!.demical)명"
-        }
+        peopleDetailLabel.text = data.capacity
     }
 }
 
