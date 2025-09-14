@@ -98,6 +98,8 @@ extension LoginViewModel {
             return LoginValidateTitle.wrongIdInput.rawValue
         } else if !(pw.count >= 2 && pw.count < 10) {
             return LoginValidateTitle.wrongPwInput.rawValue
+        } else if id.count > 30 {
+            return LoginValidateTitle.tooLongId.rawValue
         } else {
             return ""
         }
@@ -113,6 +115,7 @@ extension LoginViewModel {
     enum LoginValidateTitle: String {
         case emptyInput = "이메일과 비밀번호를 입력해주세요"
         case wrongIdInput = "@와 .com을 포함해주세요"
+        case tooLongId = "아이디가 너무 깁니다. 30자 미만의 아이디를 입력해주세요"
         case wrongPwInput = "2글자 이상 10글자 미만의 비밀번호를 설정해주세요"
     }
 
