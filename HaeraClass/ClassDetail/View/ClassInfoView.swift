@@ -41,7 +41,6 @@ final class ClassInfoView: UIView {
 
     private let locationDetailLabel: UILabel = {
         let label = UILabel()
-        label.text = "테스트"
         label.textColor = ColorSet.lightGray.color
         label.font = .boldSystemFont(ofSize: 14)
         return label
@@ -64,7 +63,6 @@ final class ClassInfoView: UIView {
 
     private let timeDetailLabel: UILabel = {
         let label = UILabel()
-        label.text = "테스트"
         label.textColor = ColorSet.lightGray.color
         label.font = .boldSystemFont(ofSize: 14)
         return label
@@ -87,7 +85,6 @@ final class ClassInfoView: UIView {
 
     private let peopleDetailLabel: UILabel = {
         let label = UILabel()
-        label.text = "테스트"
         label.textColor = ColorSet.lightGray.color
         label.font = .boldSystemFont(ofSize: 14)
         return label

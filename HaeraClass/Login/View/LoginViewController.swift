@@ -69,7 +69,6 @@ final class LoginViewController: BaseViewController {
         let label = UILabel()
         label.textColor = ColorSet.orange.color
         label.font = .boldSystemFont(ofSize: 12)
-        label.text = "테스트"
         label.textAlignment = .center
         return label
     }()

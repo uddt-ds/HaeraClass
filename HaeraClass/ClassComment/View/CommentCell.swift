@@ -23,7 +23,6 @@ final class CommentCell: BaseTableViewCell, ReusableViewProtocol {
 
     private let nickLabel: UILabel = {
         let label = UILabel()
-        label.text = "테스트"
         label.textColor = .black
         label.font = .boldSystemFont(ofSize: 12)
         return label
@@ -31,7 +30,6 @@ final class CommentCell: BaseTableViewCell, ReusableViewProtocol {
 
     private let timeLabel: UILabel = {
         let label = UILabel()
-        label.text = "n분전"
         label.textColor = ColorSet.darkGray.color
         label.font = .boldSystemFont(ofSize: 12)
         return label
@@ -78,7 +76,6 @@ final class CommentCell: BaseTableViewCell, ReusableViewProtocol {
 
     private let commentLabel: UILabel = {
         let label = UILabel()
-        label.text = "코멘트코멘트코멘트코멘트코멘트코멘트코멘트코멘트코멘트코멘트코멘트코멘트코멘트코멘트코멘트코멘트코멘트코멘트코멘트코멘트코멘트"
         label.textColor = .black
         label.font = .systemFont(ofSize: 12)
         label.numberOfLines = 0

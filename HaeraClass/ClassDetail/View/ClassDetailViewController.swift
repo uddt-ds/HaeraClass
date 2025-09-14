@@ -35,7 +35,6 @@ final class ClassDetailViewController: BaseViewController {
 
     private let nickLabel: UILabel = {
         let label = UILabel()
-        label.text = "테스트"
         label.textColor = .black
         label.font = .boldSystemFont(ofSize: 12)
         return label
@@ -84,7 +83,6 @@ final class ClassDetailViewController: BaseViewController {
         let textView = UITextView()
         textView.textColor = .darkGray
         textView.font = .systemFont(ofSize: 12)
-        textView.text = "테스트"
         textView.isSelectable = false
         textView.isEditable = false
         textView.isScrollEnabled = true

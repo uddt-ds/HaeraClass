@@ -35,7 +35,6 @@ final class CommentEditViewController: BaseViewController {
 
     private let classTitle: UILabel = {
         let label = UILabel()
-        label.text = "테스트"
         label.textColor = .black
         label.font = .boldSystemFont(ofSize: 16)
         return label
