@@ -19,23 +19,19 @@ final class ClassSearchViewModel: ViewModelProtocol {
         let viewWillAppearTrigger: PublishSubject<Void>
         let searchText: ControlProperty<String>
         let searchButtonTapped:  ControlEvent<Void>
-        let heartButtonTapped: PublishSubject<(String, Bool)>
     }
 
 
     struct Output {
         let searchResult: PublishRelay<[DataDTO]>
         let searchResultLabel: BehaviorRelay<String>
-        let saveResult: PublishRelay<String>
         let errorMessage: PublishRelay<String>
-    }
+}
 
     func transform(input: Input) -> Output {
 
         let searchResult = PublishRelay<[DataDTO]>()
         let searchResultLabel = BehaviorRelay(value: Message.greeting.rawValue)
-        let isLiked = PublishRelay<Bool>()
-        let saveResult = PublishRelay<String>()
         let errorMessage = PublishRelay<String>()
 
         input.viewWillAppearTrigger
@@ -87,40 +83,14 @@ final class ClassSearchViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
-        input.heartButtonTapped
-            .withUnretained(self)
-            .flatMap { owner, value in
-                let (classId, isLiked) = value
-                return owner.networkManager.fetchData(router: .likeClass(classId: classId, likeStatus: isLiked), type: Like.self)
-            }
-            .bind(with: self) { owner, responseData in
-                switch responseData {
-                case .success(let data):
-                    isLiked.accept(data.likeStatus)
-                case .failure(let error):
-                    errorMessage.accept(error.errorMessage)
-                }
-            }
-            .disposed(by: disposeBag)
-
-        isLiked
-            .map { $0 ? Message.isLiked.rawValue : Message.isNotLiked.rawValue }
-            .bind(with: self) { owner, value in
-                saveResult.accept(value)
-            }
-            .disposed(by: disposeBag)
-
         return Output(searchResult: searchResult,
                       searchResultLabel: searchResultLabel,
-                      saveResult: saveResult,
                       errorMessage: errorMessage)
     }
 }
 
 extension ClassSearchViewModel {
     enum Message: String {
-        case isLiked = "클래스를 찜했습니다"
-        case isNotLiked = "클래스 찜을 취소했습니다"
         case noResult = "검색 결과가 없습니다"
         case greeting = "원하는 클래스가 있으신가요?"
     }

@@ -13,9 +13,11 @@ import Toast
 
 final class ClassSearchViewController: BaseViewController {
 
-    var disposeBag = DisposeBag()
+    private var disposeBag = DisposeBag()
 
-    let viewModel = ClassSearchViewModel()
+    private let viewModel = ClassSearchViewModel()
+    private let heartButtonTapped = PublishSubject<(String, Bool)>()
+    private lazy var likeViewModel = LikeViewModel(heartButtonTapped: self.heartButtonTapped)
 
     let viewWillAppearTrigger = PublishSubject<Void>()
 
@@ -95,12 +97,9 @@ final class ClassSearchViewController: BaseViewController {
 extension ClassSearchViewController {
 
     private func bind() {
-        let heartButtonTap = PublishSubject<(String, Bool)>()
-
         let input = ClassSearchViewModel.Input(viewWillAppearTrigger: viewWillAppearTrigger,
                                                searchText: searchBar.rx.text.orEmpty,
-                                               searchButtonTapped: searchBar.rx.searchButtonClicked,
-                                               heartButtonTapped: heartButtonTap)
+                                               searchButtonTapped: searchBar.rx.searchButtonClicked)
 
         let output = viewModel.transform(input: input)
 
@@ -108,12 +107,14 @@ extension ClassSearchViewController {
             .bind(to: tableView.rx.items(cellIdentifier: ClassSearchCell.identifier, cellType: ClassSearchCell.self)) { (row, element, cell) in
                 cell.configureCell(with: element)
                 cell.rx.heartButtonTap
-                    .map{ value in
+                    .map { value in
                         let changeButtonState = value
                         cell.updateHeartButton()
                         return (element.classId, changeButtonState)
                     }
-                    .bind(to: heartButtonTap)
+                    .bind(with: self) { owner, value in
+                        owner.heartButtonTapped.onNext(value)
+                    }
                     .disposed(by: cell.disposeBag)
             }
             .disposed(by: disposeBag)
@@ -142,13 +143,13 @@ extension ClassSearchViewController {
             }
             .disposed(by: disposeBag)
 
-        output.saveResult
+        likeViewModel.saveResult
             .bind(with: self) { owner, value in
                 owner.view.makeToast(value, duration: 1.5, position: .bottom)
             }
             .disposed(by: disposeBag)
 
-        output.errorMessage
+        likeViewModel.errorMessage
             .bind(with: self) { owner, value in
                 AlertManager.shared.showBasicAlert(value)
             }

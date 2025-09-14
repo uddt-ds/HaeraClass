@@ -43,10 +43,24 @@ final class LikeViewModel {
             .disposed(by: disposeBag)
 
         isLiked
-            .map { $0 ? "클래스를 찜했습니다" : "클래스 찜을 취소했습니다" }
+            .map { $0 ? Message.isLiked.title : Message.isNotLiked.title }
             .bind(with: self) { owner, value in
                 owner.saveResult.accept(value)
             }
             .disposed(by: disposeBag)
+    }
+}
+
+extension LikeViewModel {
+    enum Message {
+        case isLiked
+        case isNotLiked
+
+        var title: String {
+            switch self {
+            case .isLiked: return "클래스를 찜했습니다"
+            case .isNotLiked: return "클래스 찜을 취소했습니다"
+            }
+        }
     }
 }
