@@ -11,10 +11,7 @@ import RxCocoa
 
 final class ClassCommentViewModel: ViewModelProtocol {
 
-    let classId: String
-    let className: String
-    var commentId: String
-    let category: Int
+    var classData: ClassData
 
     let disposeBag = DisposeBag()
 
@@ -22,11 +19,8 @@ final class ClassCommentViewModel: ViewModelProtocol {
 
     let userId = UserDefaults.standard.string(forKey: "userId") ?? ""
 
-    init(classId: String, className: String, commentId: String, category: Int) {
-        self.classId = classId
-        self.className = className
-        self.commentId = commentId
-        self.category = category
+    init(classData: ClassData) {
+        self.classData = classData
     }
 
     struct Input {
@@ -54,7 +48,7 @@ final class ClassCommentViewModel: ViewModelProtocol {
         viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
-                return owner.networkManager.getData(router: .commentSearch(classId: owner.classId), type: Comment.self)
+                return owner.networkManager.getData(router: .commentSearch(classId: owner.classData.classId), type: Comment.self)
             }
             .bind(with: self) { owner, responseData in
                 switch responseData {
@@ -69,11 +63,11 @@ final class ClassCommentViewModel: ViewModelProtocol {
         input.deleteTapped
             .withUnretained(self)
             .flatMap { owner, _ in
-                return owner.networkManager.fetchData(router: .commentDelete(classId: owner.classId, commentId: owner.commentId), type: Comment.self)
+                return owner.networkManager.fetchData(router: .commentDelete(classId: owner.classData.classId, commentId: owner.classData.commentId), type: Comment.self)
             }
             .withUnretained(self)
             .flatMap { owner, _ in
-                return owner.networkManager.getData(router: .commentSearch(classId: owner.classId), type: Comment.self)
+                return owner.networkManager.getData(router: .commentSearch(classId: owner.classData.classId), type: Comment.self)
             }
             .bind(with: self) { owner, responseData in
                 switch responseData {
@@ -88,7 +82,7 @@ final class ClassCommentViewModel: ViewModelProtocol {
         NotificationCenter.default.rx.notification(Notification.Name("isPop"), object: nil)
             .withUnretained(self)
             .flatMap { owner, _ in
-                return owner.networkManager.getData(router: .commentSearch(classId: owner.classId), type: Comment.self)
+                return owner.networkManager.getData(router: .commentSearch(classId: owner.classData.classId), type: Comment.self)
             }
             .bind(with: self) { owner, responseData in
                 switch responseData {

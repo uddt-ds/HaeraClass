@@ -15,7 +15,7 @@ struct CommentData: Decodable {
     let commentId: String
     let content: String
     let createdAt: String
-    let creator: Creator
+    let creator: CreatorDTO
 
     enum CodingKeys: String, CodingKey {
         case commentId = "comment_id"

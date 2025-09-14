@@ -35,7 +35,7 @@ final class ClassCommentViewController: BaseViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         bind()
-        setupNavigation(viewModel.className)
+        setupNavigation(viewModel.classData.className)
     }
 
     override func viewWillDisappear(_ animated: Bool) {
@@ -88,11 +88,17 @@ extension ClassCommentViewController {
                     .bind(with: self) { [weak self] owner, _ in
                         guard let self else { return }
                         AlertManager.shared.makeActionSheet {
-                            let viewModel = CommentEditViewModel(navTitle: "댓글 수정", classTitleValue: owner.viewModel.className, classId: owner.viewModel.classId, category: owner.viewModel.category, commentID: element.commentId, content: element.content)
+                            let viewModel = CommentEditViewModel(
+                                navTitle: "댓글 수정",
+                                classTitleValue: owner.viewModel.classData.className,
+                                classId: owner.viewModel.classData.classId,
+                                category: owner.viewModel.classData.category,
+                                commentID: element.commentId,
+                                content: element.content)
                             let vc = CommentEditViewController(viewModel: viewModel)
                             self.navigationController?.pushViewController(vc, animated: true)
                         } deleteHanlder: {
-                            self.viewModel.commentId = element.commentId
+                            self.viewModel.classData.commentId = element.commentId
                             deleteTapped.accept(())
                         }
                     }
@@ -102,7 +108,10 @@ extension ClassCommentViewController {
 
         rightBarButton.rx.tap
             .bind(with: self) { owner, _ in
-                let viewModel = CommentEditViewModel(navTitle: "댓글 작성", classTitleValue: owner.viewModel.className, classId: owner.viewModel.classId, category: owner.viewModel.category)
+                let viewModel = CommentEditViewModel(navTitle: "댓글 작성",
+                                                     classTitleValue: owner.viewModel.classData.className,
+                                                     classId: owner.viewModel.classData.classId,
+                                                     category: owner.viewModel.classData.category)
                 let vc = CommentEditViewController(viewModel: viewModel)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }

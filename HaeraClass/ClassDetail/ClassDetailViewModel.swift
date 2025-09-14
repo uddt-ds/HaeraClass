@@ -11,14 +11,10 @@ import RxCocoa
 
 final class ClassDetailViewModel: ViewModelProtocol {
 
-    private let classId: String
-    let className: String
-    let category: Int
+    let classData: ClassData
 
-    init(classId: String, className: String, category: Int) {
-        self.classId = classId
-        self.className = className
-        self.category = category
+    init(classData: ClassData) {
+        self.classData = classData
     }
 
     private var disposeBag = DisposeBag()
@@ -61,7 +57,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
         viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
-                return owner.networkManager.getData(router: .classDetail(classId: owner.classId), type: ClassDetailDTO.self)
+                return owner.networkManager.getData(router: .classDetail(classId: owner.classData.classId), type: ClassDetailDTO.self)
             }
             .bind(with: self) { owner, responseData in
                 switch responseData {
@@ -77,7 +73,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
         viewDidLoad
             .withUnretained(self)
             .flatMap { owner, _ in
-                return owner.networkManager.getData(router: .commentSearch(classId: owner.classId), type: Comment.self)
+                return owner.networkManager.getData(router: .commentSearch(classId: owner.classData.classId), type: Comment.self)
             }
             .bind(with: self) { owner, responseData in
                 switch responseData {
@@ -91,14 +87,14 @@ final class ClassDetailViewModel: ViewModelProtocol {
 
         input.commentButtonTap
             .bind(with: self) { owner, _ in
-                selectedClassId.accept(owner.classId)
+                selectedClassId.accept(owner.classData.classId)
             }
             .disposed(by: disposeBag)
 
         input.heartButtonTap
             .withUnretained(self)
             .flatMap { owner, value in
-                return owner.networkManager.fetchData(router: .likeClass(classId: owner.classId, likeStatus: value), type: Like.self)
+                return owner.networkManager.fetchData(router: .likeClass(classId: owner.classData.classId, likeStatus: value), type: Like.self)
             }
             .bind(with: self) { owner, responseData in
                 switch responseData {
@@ -118,7 +114,7 @@ final class ClassDetailViewModel: ViewModelProtocol {
         NotificationCenter.default.rx.notification(Notification.Name("commentPop"), object: nil)
             .withUnretained(self)
             .flatMap { owner, value in
-                owner.networkManager.getData(router: .commentSearch(classId: owner.classId), type: Comment.self)
+                owner.networkManager.getData(router: .commentSearch(classId: owner.classData.classId), type: Comment.self)
             }
             .bind(with: self) { owner, responseData in
                 switch responseData {
@@ -130,7 +126,13 @@ final class ClassDetailViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
-        return Output(detailData: detailData, photoData: photoData, commentData: commentData, selectedClassId: selectedClassId, saveResult: saveResult, commentCount: commentCount, errorMessage: errorMessage)
+        return Output(detailData: detailData,
+                      photoData: photoData,
+                      commentData: commentData,
+                      selectedClassId: selectedClassId,
+                      saveResult: saveResult,
+                      commentCount: commentCount,
+                      errorMessage: errorMessage)
     }
 }
 

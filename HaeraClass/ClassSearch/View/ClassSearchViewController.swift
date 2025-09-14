@@ -97,7 +97,10 @@ extension ClassSearchViewController {
     private func bind() {
         let heartButtonTap = PublishSubject<(String, Bool)>()
 
-        let input = ClassSearchViewModel.Input(viewWillAppearTrigger: viewWillAppearTrigger,searchText: searchBar.rx.text.orEmpty, searchButtonTapped: searchBar.rx.searchButtonClicked, heartButtonTapped: heartButtonTap)
+        let input = ClassSearchViewModel.Input(viewWillAppearTrigger: viewWillAppearTrigger,
+                                               searchText: searchBar.rx.text.orEmpty,
+                                               searchButtonTapped: searchBar.rx.searchButtonClicked,
+                                               heartButtonTapped: heartButtonTap)
 
         let output = viewModel.transform(input: input)
 
@@ -119,9 +122,14 @@ extension ClassSearchViewController {
             .bind(to: resultLabel.rx.text)
             .disposed(by: disposeBag)
 
-        tableView.rx.modelSelected(Data.self)
+        tableView.rx.modelSelected(DataDTO.self)
             .bind(with: self) { owner, data in
-                let viewModel = ClassDetailViewModel(classId: data.classId, className: data.title, category: data.category)
+                let viewModel = ClassDetailViewModel(
+                    classData: .init(classId: data.classId,
+                                     className: data.title,
+                                     commentId: data.creator.userID,
+                                     category: data.category)
+                )
                 let vc = ClassDetailViewController(viewModel: viewModel)
                 owner.navigationItem.backButtonTitle = ""
                 owner.navigationController?.pushViewController(vc, animated: true)

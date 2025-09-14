@@ -8,10 +8,10 @@
 import Foundation
 
 struct ClassCheckDTO: Decodable {
-    let data: [Data]
+    let data: [DataDTO]
 }
 
-struct Data: Decodable {
+struct DataDTO: Decodable {
     let classId: String
     let category: Int
     let title: String
@@ -21,7 +21,7 @@ struct Data: Decodable {
     let imageUrl: String
     let createdAt: String
     let isLiked: Bool
-    let creator: Creator
+    let creator: CreatorDTO
 
     enum CodingKeys: String, CodingKey {
         case classId = "class_id"
@@ -53,7 +53,7 @@ struct Data: Decodable {
     }
 }
 
-extension Data {
+extension DataDTO {
     var bindImageUrl: URL? {
         return URL(string: BaseURL.url + "/v1" + imageUrl)
     }
@@ -84,7 +84,7 @@ extension Data {
     }
 }
 
-struct Creator: Decodable {
+struct CreatorDTO: Decodable {
     let userID: String
     let nick: String
     let profileImage: String?
@@ -96,7 +96,7 @@ struct Creator: Decodable {
     }
 }
 
-extension Creator {
+extension CreatorDTO {
     var bindImageUrl: URL? {
         return URL(string: BaseURL.url + "/v1" + (profileImage ?? ""))
     }

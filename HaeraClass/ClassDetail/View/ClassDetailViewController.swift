@@ -99,7 +99,7 @@ final class ClassDetailViewController: BaseViewController {
         super.viewDidLoad()
         bind()
         updateHeartButtonState()
-        setupNavigation(viewModel.className)
+        setupNavigation(viewModel.classData.className)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -262,7 +262,12 @@ extension ClassDetailViewController {
 
         output.selectedClassId
             .bind(with: self) { owner, value in
-                let viewModel = ClassCommentViewModel(classId: value, className: owner.viewModel.className, commentId: "", category: owner.viewModel.category)
+                let viewModel = ClassCommentViewModel(
+                    classData: .init(classId: owner.viewModel.classData.classId,
+                                     className: owner.viewModel.classData.className,
+                                     commentId: owner.viewModel.classData.commentId,
+                                     category: owner.viewModel.classData.category)
+                )
                 let vc = ClassCommentViewController(viewModel: viewModel)
                 owner.navigationItem.backButtonTitle = ""
                 owner.navigationController?.pushViewController(vc, animated: true)

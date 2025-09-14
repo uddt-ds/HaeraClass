@@ -24,7 +24,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
 
 
     struct Output {
-        let searchResult: PublishRelay<[Data]>
+        let searchResult: PublishRelay<[DataDTO]>
         let searchResultLabel: BehaviorRelay<String>
         let saveResult: PublishRelay<String>
         let errorMessage: PublishRelay<String>
@@ -32,7 +32,7 @@ final class ClassSearchViewModel: ViewModelProtocol {
 
     func transform(input: Input) -> Output {
 
-        let searchResult = PublishRelay<[Data]>()
+        let searchResult = PublishRelay<[DataDTO]>()
         let searchResultLabel = BehaviorRelay(value: Message.greeting.rawValue)
         let isLiked = PublishRelay<Bool>()
         let saveResult = PublishRelay<String>()
@@ -110,7 +110,10 @@ final class ClassSearchViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
-        return Output(searchResult: searchResult, searchResultLabel: searchResultLabel, saveResult: saveResult, errorMessage: errorMessage)
+        return Output(searchResult: searchResult,
+                      searchResultLabel: searchResultLabel,
+                      saveResult: saveResult,
+                      errorMessage: errorMessage)
     }
 }
 

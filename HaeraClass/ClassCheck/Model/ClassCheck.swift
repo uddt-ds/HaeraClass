@@ -20,5 +20,5 @@ struct ClassCheck {
     let imageUrl: URL?
     let persent: String
     let isLiked: Bool
-    let creator: Creator
+    let creator: CreatorDTO
 }

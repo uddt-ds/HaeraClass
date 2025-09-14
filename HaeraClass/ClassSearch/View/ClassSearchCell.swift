@@ -146,7 +146,7 @@ final class ClassSearchCell: BaseTableViewCell, ReusableViewProtocol {
     }
 
 
-    func configureCell(with data: Data) {
+    func configureCell(with data: DataDTO) {
 
         classImageView.kf.setImageWithHeaders(with: data.bindImageUrl)
         headTitleLabel.text = data.title

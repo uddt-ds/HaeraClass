@@ -108,7 +108,11 @@ extension ClassCheckViewController {
 
         let heartButtonTap = PublishSubject<(String, Bool)>()
 
-        let input = ClassCheckViewModel.Input(viewWillAppearTrigger: viewWillAppearTrigger, initialSet: Observable.just(()), selectedCategory: selectedCategory, currentButtonState: buttonState, sortButtonTap: sortButton.rx.tap, heartButtonTapped: heartButtonTap)
+        let input = ClassCheckViewModel.Input(viewWillAppearTrigger: viewWillAppearTrigger,
+                                              selectedCategory: selectedCategory,
+                                              currentButtonState: buttonState,
+                                              sortButtonTap: sortButton.rx.tap,
+                                              heartButtonTap: heartButtonTap)
 
         let output = viewModel.transform(input: input)
 
@@ -158,7 +162,12 @@ extension ClassCheckViewController {
 
         tableView.rx.modelSelected(ClassCheck.self)
             .bind(with: self) { owner, data in
-                let viewModel = ClassDetailViewModel(classId: data.classId, className: data.title, category: data.category)
+                let viewModel = ClassDetailViewModel(
+                    classData: .init(classId: data.classId,
+                                     className: data.title,
+                                     commentId: data.creator.userID,
+                                     category: data.category)
+                )
                 let vc = ClassDetailViewController(viewModel: viewModel)
                 owner.navigationItem.backButtonTitle = ""
                 owner.navigationController?.navigationBar.tintColor = .black

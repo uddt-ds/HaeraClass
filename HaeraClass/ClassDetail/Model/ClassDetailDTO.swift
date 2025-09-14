@@ -20,7 +20,7 @@ struct ClassDetailDTO: Decodable {
     let imageUrls: [String]
     let createdAt: String
     let isLiked: Bool
-    let creator: Creator
+    let creator: CreatorDTO
 
     enum CodingKeys: String, CodingKey {
         case classId = "class_id"
