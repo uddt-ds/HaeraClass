@@ -20,11 +20,9 @@ final class ClassCheckViewModel: ViewModelProtocol {
 
     struct Input {
         let viewWillAppearTrigger: PublishSubject<Void>
-        let initialSet: Observable<Void>
         let selectedCategory: BehaviorRelay<Int>
         let currentButtonState: BehaviorRelay<Bool>
         let sortButtonTap: ControlEvent<Void>
-        let heartButtonTapped: PublishSubject<(String, Bool)>
     }
 
     struct State {
@@ -36,11 +34,8 @@ final class ClassCheckViewModel: ViewModelProtocol {
         let selectedData: BehaviorRelay<[ClassCheck]>
         let totalCount: PublishRelay<String>
         let buttonItems: BehaviorRelay<[CategoryTitle]>
-        let saveResult: PublishRelay<String>
         let selectedCategories: BehaviorRelay<Set<Int>>
-        let errorMessage: PublishRelay<String>
         let scrollGoToTopTrigger: PublishRelay<Void>
-
     }
 
     func transform(input: Input) -> Output {
@@ -53,7 +48,6 @@ final class ClassCheckViewModel: ViewModelProtocol {
         let selectedData = BehaviorRelay<[ClassCheck]>(value: [])
         let totalCount = PublishRelay<String>()
 
-        let isLiked = PublishRelay<Bool>()
         let saveResult = PublishRelay<String>()
 
         let errorMessage = PublishRelay<String>()
@@ -102,6 +96,9 @@ final class ClassCheckViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
+        //TODO: 코드 로직 메서드 단위로 분리
+        // Set Collection 업데이트
+        // 필터링과 정렬 책임 분리
         input.selectedCategory
             .withLatestFrom(input.currentButtonState) { category, sortedToggle in
                 return (category, sortedToggle)
@@ -146,37 +143,10 @@ final class ClassCheckViewModel: ViewModelProtocol {
             }
             .disposed(by: disposeBag)
 
-
-        input.heartButtonTapped
-            .withUnretained(self)
-            .flatMap { owner, value in
-                let (classId, isLiked) = value
-                return owner.networkManager.fetchData(router: .likeClass(classId: classId, likeStatus: isLiked), type: Like.self)
-            }
-            .bind(with: self) { owner, responseData in
-                switch responseData {
-                case .success(let data):
-                    isLiked.accept(data.likeStatus)
-                case .failure(let error):
-                    errorMessage.accept(error.errorMessage)
-                }
-            }
-            .disposed(by: disposeBag)
-
-        isLiked
-            .map { $0 ? "클래스를 찜했습니다" : "클래스 찜을 취소했습니다" }
-            .bind(with: self) { owner, value in
-                saveResult.accept(value)
-            }
-            .disposed(by: disposeBag)
-
-
         return Output(selectedData: selectedData,
                       totalCount: totalCount,
                       buttonItems: buttonItems,
-                      saveResult: saveResult,
                       selectedCategories: selectedCategories,
-                      errorMessage: errorMessage,
                       scrollGoToTopTrigger: scrollGoToTopTrigger)
     }
 

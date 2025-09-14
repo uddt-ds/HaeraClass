@@ -17,6 +17,10 @@ final class ClassCheckViewController: BaseViewController {
 
     let viewModel = ClassCheckViewModel()
 
+    let heartButtonTap = PublishSubject<(String, Bool)>()
+
+    private lazy var likeViewModel = LikeViewModel(heartButtonTapped: heartButtonTap)
+
     let viewWillAppearTrigger = PublishSubject<Void>()
 
     private lazy var collectionView: UICollectionView = {
@@ -106,13 +110,10 @@ extension ClassCheckViewController {
 
         let selectedCategory = BehaviorRelay(value: 0)
 
-        let heartButtonTap = PublishSubject<(String, Bool)>()
-
         let input = ClassCheckViewModel.Input(viewWillAppearTrigger: viewWillAppearTrigger,
                                               selectedCategory: selectedCategory,
                                               currentButtonState: buttonState,
-                                              sortButtonTap: sortButton.rx.tap,
-                                              heartButtonTap: heartButtonTap)
+                                              sortButtonTap: sortButton.rx.tap)
 
         let output = viewModel.transform(input: input)
 
@@ -125,7 +126,9 @@ extension ClassCheckViewController {
                         cell.updateHeartButton()
                         return (element.classId, changeButtonState)
                     }
-                    .bind(to: heartButtonTap)
+                    .bind(with: self) { owner, value in
+                        owner.heartButtonTap.onNext(value)
+                    }
                     .disposed(by: cell.disposeBag)
             }
             .disposed(by: disposeBag)
@@ -175,13 +178,13 @@ extension ClassCheckViewController {
             }
             .disposed(by: disposeBag)
 
-        output.saveResult
+        likeViewModel.saveResult
             .bind(with: self) { owner, value in
                 owner.view.makeToast(value, duration: 1.5, position: .bottom)
             }
             .disposed(by: disposeBag)
 
-        output.errorMessage
+        likeViewModel.errorMessage
             .bind(with: self) { owner, value in
                 AlertManager.shared.showBasicAlert(value)
             }
