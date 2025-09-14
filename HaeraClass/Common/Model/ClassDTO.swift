@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct Class: Decodable {
-    let data: [ClassData]
+struct ClassDTO: Decodable {
+    let data: [ClassDataDTO]
 }
 
-struct ClassData: Decodable {
+struct ClassDataDTO: Decodable {
     let classId: String
     let category: Int
     let title: String
@@ -19,7 +19,7 @@ struct ClassData: Decodable {
     let imageUrl: String
     let createdAt: String
     let isLiked: Bool
-    let creator: ClassCreator
+    let creator: ClassCreatorDTO
 
     enum CodingKeys: String, CodingKey {
         case classId = "class_id"
@@ -33,7 +33,7 @@ struct ClassData: Decodable {
     }
 }
 
-struct ClassCreator: Decodable {
+struct ClassCreatorDTO: Decodable {
     let userId: String
     let nick: String
     let profileImage: String
