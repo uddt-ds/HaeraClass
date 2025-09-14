@@ -262,11 +262,12 @@ extension ClassDetailViewController {
 
         output.selectedClassId
             .bind(with: self) { owner, value in
+                let data = owner.viewModel.classData
                 let viewModel = ClassCommentViewModel(
-                    classData: .init(classId: owner.viewModel.classData.classId,
-                                     className: owner.viewModel.classData.className,
-                                     commentId: owner.viewModel.classData.commentId,
-                                     category: owner.viewModel.classData.category)
+                    classData: .init(classId: data.classId,
+                                     className: data.className,
+                                     commentId: data.commentId,
+                                     category: data.category)
                 )
                 let vc = ClassCommentViewController(viewModel: viewModel)
                 owner.navigationItem.backButtonTitle = ""

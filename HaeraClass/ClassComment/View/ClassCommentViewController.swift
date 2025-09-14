@@ -15,6 +15,8 @@ final class ClassCommentViewController: BaseViewController {
 
     var viewModel: ClassCommentViewModel
 
+    let deleteTapped = PublishRelay<Void>()
+
     init(viewModel: ClassCommentViewModel) {
         self.viewModel = viewModel
         super.init(nibName: nil, bundle: nil)
@@ -64,16 +66,11 @@ final class ClassCommentViewController: BaseViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(customView: rightBarButton)
     }
 
-    deinit {
-        print("deinit")
-    }
 }
 
 //MARK: Rx Binding
 extension ClassCommentViewController {
     private func bind() {
-
-        let deleteTapped = PublishRelay<Void>()
 
         let input = ClassCommentViewModel.Input(viewDidLoadTrigger: .just(()), deleteTapped: deleteTapped)
 
@@ -84,20 +81,24 @@ extension ClassCommentViewController {
                 cell.configureCell(element)
 
                 cell.dotButtonHidden(!(output.currentUserId.value == element.creator.userID))
+
                 cell.rx.dotButtonTapped
-                    .bind(with: self) { [weak self] owner, _ in
-                        guard let self else { return }
-                        AlertManager.shared.makeActionSheet {
+                    .debug()
+                    .bind(with: self) { owner, _ in
+                        AlertManager.shared.makeActionSheet { [weak self] in
+                            guard let self else { return }
+                            let data = self.viewModel.classData
                             let viewModel = CommentEditViewModel(
                                 navTitle: "댓글 수정",
-                                classTitleValue: owner.viewModel.classData.className,
-                                classId: owner.viewModel.classData.classId,
-                                category: owner.viewModel.classData.category,
+                                classTitleValue: data.className,
+                                classId: data.classId,
+                                category: data.category,
                                 commentID: element.commentId,
                                 content: element.content)
                             let vc = CommentEditViewController(viewModel: viewModel)
                             self.navigationController?.pushViewController(vc, animated: true)
-                        } deleteHanlder: {
+                        } deleteHanlder: { [weak self] in
+                            guard let self else { return }
                             self.viewModel.classData.commentId = element.commentId
                             deleteTapped.accept(())
                         }
@@ -108,10 +109,11 @@ extension ClassCommentViewController {
 
         rightBarButton.rx.tap
             .bind(with: self) { owner, _ in
+                let data = owner.viewModel.classData
                 let viewModel = CommentEditViewModel(navTitle: "댓글 작성",
-                                                     classTitleValue: owner.viewModel.classData.className,
-                                                     classId: owner.viewModel.classData.classId,
-                                                     category: owner.viewModel.classData.category)
+                                                     classTitleValue: data.className,
+                                                     classId: data.classId,
+                                                     category: data.category)
                 let vc = CommentEditViewController(viewModel: viewModel)
                 owner.navigationController?.pushViewController(vc, animated: true)
             }
