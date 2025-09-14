@@ -62,12 +62,11 @@ extension ClassDetailDTO {
         return changeValue(capacity)
     }
 
-    // TODO: 다른 방법 또 있는지 찾아보기
     private func changeValue(_ capacity: Int?) -> String {
-        if capacity == nil {
-            return "미정"
+        if let capacity {
+            return "\(capacity.demical)명"
         } else {
-            return "\(capacity!.demical)명"
+            return "미정"
         }
     }
 }
