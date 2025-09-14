@@ -46,9 +46,7 @@ final class CommentEditViewModel: ViewModelProtocol{
 
     func transform(input: Input) -> Output {
 
-        let maxCount = 200
-
-        let textCount = BehaviorRelay(value: "0 / \(maxCount)")
+        let textCount = BehaviorRelay(value: "0 / \(CommentLimit.maxCount.rawValue)")
         let textColor = BehaviorRelay(value: "")
         let saveButtonState = BehaviorRelay(value: false)
 
@@ -64,12 +62,12 @@ final class CommentEditViewModel: ViewModelProtocol{
             .withUnretained(self)
             .map { owner, value in
                 if value == "댓글을 작성해주세요" {
-                    return "0 / \(maxCount)"
-                } else if value.count > 200 {
-                    return "200자 초과"
+                    return "0 / \(CommentLimit.maxCount.rawValue)"
+                } else if value.count > CommentLimit.maxCount.rawValue {
+                    return "\(CommentLimit.maxCount.rawValue)자 초과"
                 }
                 let onlyTextCount = owner.getOnlyTextCount(value)
-                return "\(onlyTextCount) / \(maxCount)"
+                return "\(onlyTextCount) / \(CommentLimit.maxCount.rawValue)"
             }
             .bind(with: self) { owner, value in
                 textCount.accept(value)
@@ -82,9 +80,9 @@ final class CommentEditViewModel: ViewModelProtocol{
                 owner.getOnlyTextCount(value)
             }
             .map { value in
-                if value > -1 && value < 150 {
+                if value > -1 && value < CommentLimit.middleCount.rawValue {
                     return "black"
-                } else if value >= 150 && value <= 200 {
+                } else if value >= CommentLimit.middleCount.rawValue && value <= CommentLimit.maxCount.rawValue {
                     return "red"
                 } else {
                     return "red"
@@ -100,7 +98,7 @@ final class CommentEditViewModel: ViewModelProtocol{
             .map { owner, value in
                 owner.getOnlyTextCount(value)
             }
-            .map { !($0 < 2 || $0 > 200) }
+            .map { !($0 < CommentLimit.minCount.rawValue || $0 > CommentLimit.maxCount.rawValue) }
             .bind(with: self) { owner, value in
                 saveButtonState.accept(value)
             }
@@ -108,6 +106,7 @@ final class CommentEditViewModel: ViewModelProtocol{
 
         input.saveButtonTap
             .withLatestFrom(input.textField)
+            .filter { $0 != "댓글을 작성해주세요" }
             .withUnretained(self)
             .flatMap { owner, value in
                 if owner.navTitle == "댓글 작성" {
@@ -127,12 +126,23 @@ final class CommentEditViewModel: ViewModelProtocol{
             }
             .disposed(by: disposeBag)
 
-        return Output(textCount: textCount, textColor: textColor, saveButtonState: saveButtonState, isSaved: isSaved, errorMessage: errorMessage)
+        return Output(textCount: textCount,
+                      textColor: textColor,
+                      saveButtonState: saveButtonState,
+                      isSaved: isSaved,
+                      errorMessage: errorMessage)
     }
 
     private func getOnlyTextCount(_ text: String) -> Int {
         let split = text.split(separator: " ")
         return split.joined().count
     }
+}
 
+extension CommentEditViewModel {
+    enum CommentLimit: Int {
+        case minCount = 2
+        case middleCount = 150
+        case maxCount = 200
+    }
 }
