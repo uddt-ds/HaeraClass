@@ -18,7 +18,8 @@ final class ClassCheckViewController: BaseViewController {
     let viewModel = ClassCheckViewModel()
     let heartButtonTap = PublishSubject<(String, Bool)>()
 
-    private lazy var likeViewModel = LikeViewModel(heartButtonTapped: heartButtonTap)
+//    private lazy var likeViewModel = LikeViewModel(heartButtonTapped: heartButtonTap)
+    private let likeViewModel = LikeViewModel()
 
     let viewWillAppearTrigger = PublishSubject<Void>()
 
@@ -114,7 +115,10 @@ extension ClassCheckViewController {
                                               currentButtonState: buttonState,
                                               sortButtonTap: sortButton.rx.tap)
 
+        let likeInput = LikeViewModel.Input(heartButtonTapped: heartButtonTap)
+
         let output = viewModel.transform(input: input)
+        let likeOutput = likeViewModel.transform(input: likeInput)
 
         output.selectedData
             .bind(to: tableView.rx.items(cellIdentifier: ClassCategoryTableViewCell.identifier, cellType:ClassCategoryTableViewCell.self)) { (row, element, cell) in
@@ -177,18 +181,6 @@ extension ClassCheckViewController {
             }
             .disposed(by: disposeBag)
 
-        likeViewModel.saveResult
-            .bind(with: self) { owner, value in
-                owner.view.makeToast(value, duration: 1.5, position: .bottom)
-            }
-            .disposed(by: disposeBag)
-
-        likeViewModel.errorMessage
-            .bind(with: self) { owner, value in
-                AlertManager.shared.showBasicAlert(value)
-            }
-            .disposed(by: disposeBag)
-
         output.scrollGoToTopTrigger
             .withLatestFrom(tableView.rx.contentOffset)
             .bind(with: self) { owner, value in
@@ -199,6 +191,19 @@ extension ClassCheckViewController {
                 }
             }
             .disposed(by: disposeBag)
+
+        likeOutput.saveResult
+            .bind(with: self) { owner, value in
+                owner.view.makeToast(value, duration: 1.5, position: .bottom)
+            }
+            .disposed(by: disposeBag)
+
+        likeOutput.errorMessage
+            .bind(with: self) { owner, value in
+                AlertManager.shared.showBasicAlert(value)
+            }
+            .disposed(by: disposeBag)
+
     }
 }
 extension ClassCheckViewController {

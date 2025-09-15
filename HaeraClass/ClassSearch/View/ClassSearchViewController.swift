@@ -17,7 +17,7 @@ final class ClassSearchViewController: BaseViewController {
 
     private let viewModel = ClassSearchViewModel()
     private let heartButtonTapped = PublishSubject<(String, Bool)>()
-    private lazy var likeViewModel = LikeViewModel(heartButtonTapped: self.heartButtonTapped)
+    private let likeViewModel = LikeViewModel()
 
     let viewWillAppearTrigger = PublishSubject<Void>()
 
@@ -101,7 +101,11 @@ extension ClassSearchViewController {
                                                searchText: searchBar.rx.text.orEmpty,
                                                searchButtonTapped: searchBar.rx.searchButtonClicked)
 
+        let likeInput = LikeViewModel.Input(heartButtonTapped: heartButtonTapped)
+
         let output = viewModel.transform(input: input)
+
+        let likeOutput = likeViewModel.transform(input: likeInput)
 
         output.searchResult
             .bind(to: tableView.rx.items(cellIdentifier: ClassSearchCell.identifier, cellType: ClassSearchCell.self)) { (row, element, cell) in
@@ -143,13 +147,13 @@ extension ClassSearchViewController {
             }
             .disposed(by: disposeBag)
 
-        likeViewModel.saveResult
+        likeOutput.saveResult
             .bind(with: self) { owner, value in
                 owner.view.makeToast(value, duration: 1.5, position: .bottom)
             }
             .disposed(by: disposeBag)
 
-        likeViewModel.errorMessage
+        likeOutput.errorMessage
             .bind(with: self) { owner, value in
                 AlertManager.shared.showBasicAlert(value)
             }
