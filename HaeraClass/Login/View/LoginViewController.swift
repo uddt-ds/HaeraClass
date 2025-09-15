@@ -91,7 +91,6 @@ final class LoginViewController: BaseViewController {
         super.configureLayout()
 
         loginImageView.snp.makeConstraints { make in
-
             make.top.equalTo(view.safeAreaLayoutGuide).offset(60)
             make.centerX.equalToSuperview()
             make.size.equalTo(140)
@@ -133,11 +132,7 @@ final class LoginViewController: BaseViewController {
 
     private func buttonState(_ state: Bool) {
         button.isEnabled = state
-        if button.isEnabled {
-            button.backgroundColor = ColorSet.lightOrange.color
-        } else {
-            button.backgroundColor = ColorSet.darkGray.color
-        }
+        button.backgroundColor = button.isEnabled ? ColorSet.lightOrange.color : ColorSet.darkGray.color
     }
 }
 

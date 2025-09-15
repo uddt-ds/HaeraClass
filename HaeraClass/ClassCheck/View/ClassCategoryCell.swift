@@ -56,12 +56,7 @@ final class ClassCategoryCell: BaseCollectionViewCell, ReusableViewProtocol {
 
     func setupButton(isSelected: Bool) {
         button.isSelected = isSelected
-
-        if button.isSelected {
-            button.layer.borderColor = ColorSet.lightOrange.color.cgColor
-        } else {
-            button.layer.borderColor = ColorSet.lightGray.color.cgColor
-        }
+        button.layer.borderColor = button.isSelected ? ColorSet.lightOrange.color.cgColor : ColorSet.lightGray.color.cgColor
     }
 
     override func prepareForReuse() {
