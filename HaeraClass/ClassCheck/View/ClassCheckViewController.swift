@@ -16,7 +16,6 @@ final class ClassCheckViewController: BaseViewController {
     let disposeBag = DisposeBag()
 
     let viewModel = ClassCheckViewModel()
-
     let heartButtonTap = PublishSubject<(String, Bool)>()
 
     private lazy var likeViewModel = LikeViewModel(heartButtonTapped: heartButtonTap)
@@ -138,7 +137,7 @@ extension ClassCheckViewController {
             .disposed(by: disposeBag)
 
         output.buttonItems
-            .bind(to: collectionView.rx.items(cellIdentifier: ClassCategoryCell.identifier,cellType: ClassCategoryCell.self)) {
+            .bind(to: collectionView.rx.items(cellIdentifier: ClassCategoryCell.identifier, cellType: ClassCategoryCell.self)) {
                 (row, element, cell) in
 
                 cell.configureCell(with: element.title, tag: element.rawValue)
@@ -192,7 +191,6 @@ extension ClassCheckViewController {
 
         output.scrollGoToTopTrigger
             .withLatestFrom(tableView.rx.contentOffset)
-            .debug()
             .bind(with: self) { owner, value in
                 if value.y != 0 {
                     DispatchQueue.main.async {

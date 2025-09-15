@@ -171,20 +171,7 @@ final class ClassCategoryTableViewCell: BaseTableViewCell, ReusableViewProtocol 
     }
 
     func configureCell(with data: ClassCheck) {
-        guard let headerKey = Bundle.main.object(forInfoDictionaryKey: "SesacKey") as? String else { return }
-
-        let modifier = AnyModifier { request in
-            var header = request
-            header.setValue(UserDefaults.standard.string(forKey: "token") ?? "", forHTTPHeaderField: "Authorization")
-            header.setValue(headerKey, forHTTPHeaderField: "SesacKey")
-            return header
-        }
-
-        classImageView.kf.setImage(with: data.imageUrl,
-                                   options: [
-                                    .requestModifier(modifier)
-                                   ]
-        )
+        classImageView.kf.setImageWithHeaders(with: data.imageUrl)
         headTitleLabel.text = data.title
         categoryTag.setTitle(data.categoryTitle, for: .normal)
         contentTitle.text = data.description
