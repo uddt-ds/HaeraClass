@@ -13,9 +13,9 @@ final class ClassCommentViewModel: ViewModelProtocol {
 
     var classData: ClassData
 
-    let disposeBag = DisposeBag()
+    private let disposeBag = DisposeBag()
 
-    let networkManager = NetworkManager.shared
+    private let networkManager = NetworkManager.shared
 
     let userId = UserDefaults.standard.string(forKey: "userId") ?? ""
 

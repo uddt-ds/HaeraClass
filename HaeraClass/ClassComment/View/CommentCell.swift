@@ -157,6 +157,7 @@ final class CommentCell: BaseTableViewCell, ReusableViewProtocol {
     }
 }
 
+
 extension Reactive where Base: CommentCell {
     var dotButtonTapped: ControlEvent<Void> {
         return base.dotButton.rx.tap

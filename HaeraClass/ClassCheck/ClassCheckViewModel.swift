@@ -21,7 +21,7 @@ final class ClassCheckViewModel: ViewModelProtocol {
     struct Input {
         let viewWillAppearTrigger: PublishSubject<Void>
         let selectedCategory: BehaviorRelay<Int>
-        let currentButtonState: BehaviorRelay<Bool>
+        let currentButtonState: BehaviorRelay<Bool>   // 정렬 버튼
         let sortButtonTap: ControlEvent<Void>
     }
 
@@ -44,16 +44,10 @@ final class ClassCheckViewModel: ViewModelProtocol {
 
         let buttonTitles = CategoryTitle.allCases
         let buttonItems = BehaviorRelay<[CategoryTitle]>(value: buttonTitles)
-
         let selectedData = BehaviorRelay<[ClassCheck]>(value: [])
         let totalCount = PublishRelay<String>()
-
-        let saveResult = PublishRelay<String>()
-
         let errorMessage = PublishRelay<String>()
-
         let selectedCategories = BehaviorRelay(value: state.currentCategories)
-
         let scrollGoToTopTrigger = PublishRelay<Void>()
 
         input.viewWillAppearTrigger
@@ -64,7 +58,6 @@ final class ClassCheckViewModel: ViewModelProtocol {
             .bind(with: self) { owner, value in
                 switch value {
                 case .success(let response):
-
                     let data = response.data.map { $0.toDomain() }
                     state.totalData.accept(data)
 
@@ -74,9 +67,9 @@ final class ClassCheckViewModel: ViewModelProtocol {
                         let filterData = data.filter { state.currentCategories.contains($0.category) }
                         selectedData.accept(filterData)
                     }
-
                     let countTitle = "\(selectedData.value.count)개"
                     totalCount.accept(countTitle)
+
                 case .failure(let error):
                     errorMessage.accept(error.errorMessage)
                 }
