@@ -13,7 +13,7 @@ final class ClassCommentViewController: BaseViewController {
 
     var disposeBag = DisposeBag()
 
-    var viewModel: ClassCommentViewModel
+    private let viewModel: ClassCommentViewModel
 
     let deleteTapped = PublishRelay<Void>()
 
@@ -77,16 +77,15 @@ extension ClassCommentViewController {
         let output = viewModel.transform(input: input)
 
         output.commentData
-            .bind(to: tableView.rx.items(cellIdentifier: CommentCell.identifier, cellType: CommentCell.self)) { (row, element, cell) in
+            .bind(to: tableView.rx.items(cellIdentifier: CommentCell.identifier, cellType: CommentCell.self)) { [weak self] (row, element, cell) in
+                guard let self else { return }
                 cell.configureCell(element)
 
                 cell.dotButtonHidden(!(output.currentUserId.value == element.creator.userID))
 
                 cell.rx.dotButtonTapped
-                    .debug()
                     .bind(with: self) { owner, _ in
-                        AlertManager.shared.makeActionSheet { [weak self] in
-                            guard let self else { return }
+                        AlertManager.shared.makeActionSheet {
                             let data = self.viewModel.classData
                             let viewModel = CommentEditViewModel(
                                 navTitle: "댓글 수정",
@@ -97,10 +96,9 @@ extension ClassCommentViewController {
                                 content: element.content)
                             let vc = CommentEditViewController(viewModel: viewModel)
                             self.navigationController?.pushViewController(vc, animated: true)
-                        } deleteHanlder: { [weak self] in
-                            guard let self else { return }
+                        } deleteHanlder: {
                             self.viewModel.classData.commentId = element.commentId
-                            deleteTapped.accept(())
+                            self.deleteTapped.accept(())
                         }
                     }
                     .disposed(by: cell.disposeBag)
